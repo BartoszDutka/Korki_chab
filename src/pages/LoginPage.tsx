@@ -101,7 +101,6 @@ export default function LoginPage() {
     setError('')
     try {
       await signInWithGoogle()
-      navigate(afterAuthPath())
     } catch (err) {
       const code = (err as { code?: string }).code ?? ''
       setError(googleErrorMessage(code))

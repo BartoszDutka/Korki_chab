@@ -19,6 +19,19 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
+function fallbackProfile(user: User): UserProfile {
+  const now = new Date().toISOString()
+  return {
+    uid: user.uid,
+    displayName: user.displayName ?? user.email ?? 'Użytkownik',
+    email: user.email ?? '',
+    photoURL: user.photoURL ?? undefined,
+    role: isAdminEmail(user.email) ? 'admin' : 'user',
+    createdAt: now,
+    updatedAt: now,
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<UserProfile | null>(null)
@@ -27,39 +40,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let unsub: (() => void) | undefined
     let unsubProfile: (() => void) | undefined
+    let cancelled = false
 
-    const start = async () => {
+    const syncProfile = async (u: User) => {
+      const { usersService } = await import('../services/usersService')
+      try {
+        const p = await usersService.createOrUpdate(u.uid, {
+          displayName: u.displayName ?? u.email ?? 'Użytkownik',
+          email: u.email ?? '',
+          photoURL: u.photoURL ?? undefined,
+        })
+        if (!cancelled) setProfile(p)
+        if (!cancelled) {
+          unsubProfile = usersService.subscribe(u.uid, (next) => {
+            if (!cancelled) setProfile(next ?? fallbackProfile(u))
+          })
+        }
+      } catch (err) {
+        if (import.meta.env.DEV) console.warn('Profile sync failed:', err)
+        if (!cancelled) setProfile(fallbackProfile(u))
+      }
+    }
+
+    void (async () => {
       const [{ onAuthStateChanged }, auth] = await Promise.all([
         import('firebase/auth'),
         getAuthInstance(),
       ])
-      const { usersService } = await import('../services/usersService')
-      unsub = onAuthStateChanged(auth, async (u) => {
+      if (cancelled) return
+
+      unsub = onAuthStateChanged(auth, (u) => {
+        setUser(u)
+        setAuthChecked(true)
+
         unsubProfile?.()
         unsubProfile = undefined
-        setUser(u)
+
         if (u) {
-          const p = await usersService.createOrUpdate(u.uid, {
-            displayName: u.displayName ?? u.email ?? 'Użytkownik',
-            email: u.email ?? '',
-            photoURL: u.photoURL ?? undefined,
-          })
-          setProfile(p)
-          unsubProfile = usersService.subscribe(u.uid, setProfile)
+          void syncProfile(u)
         } else {
           setProfile(null)
         }
-        setAuthChecked(true)
       })
-    }
-
-    if ('requestIdleCallback' in window) {
-      window.requestIdleCallback(() => void start(), { timeout: 3000 })
-    } else {
-      globalThis.setTimeout(() => void start(), 500)
-    }
+    })()
 
     return () => {
+      cancelled = true
       unsub?.()
       unsubProfile?.()
     }
@@ -106,7 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const isAdmin = profile?.role === 'admin' || isAdminEmail(user?.email)
-  const isUser = !!user && profile?.role === 'user'
+  const isUser = !!user && !isAdmin
   const loading = !authChecked
 
   const value = useMemo(
