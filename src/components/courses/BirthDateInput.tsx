@@ -30,14 +30,15 @@ const currentYear = new Date().getFullYear()
 const YEARS = Array.from({ length: currentYear - 1995 + 1 }, (_, i) => currentYear - i)
 const DAYS = Array.from({ length: 31 }, (_, i) => String(i + 1).padStart(2, '0'))
 
+const selectClass =
+  'w-full min-w-0 border border-outline-variant rounded-lg px-3 py-3 text-body-md bg-surface-bright focus:ring-2 focus:ring-secondary-container focus:outline-none appearance-auto cursor-pointer'
+
 export default function BirthDateInput({
   value,
   onChange,
-  className,
 }: {
   value: string
   onChange: (isoDate: string) => void
-  className?: string
 }) {
   const { day, month, year } = parseIsoDate(value)
 
@@ -47,9 +48,9 @@ export default function BirthDateInput({
   }
 
   return (
-    <div className={`grid grid-cols-3 gap-2 ${className ?? ''}`}>
+    <div className="grid grid-cols-3 gap-2 mt-1">
       <select
-        className={className}
+        className={selectClass}
         value={day}
         onChange={(e) => setPart('day', e.target.value)}
         aria-label="Dzień urodzenia"
@@ -60,7 +61,7 @@ export default function BirthDateInput({
         ))}
       </select>
       <select
-        className={className}
+        className={selectClass}
         value={month}
         onChange={(e) => setPart('month', e.target.value)}
         aria-label="Miesiąc urodzenia"
@@ -71,7 +72,7 @@ export default function BirthDateInput({
         ))}
       </select>
       <select
-        className={className}
+        className={selectClass}
         value={year}
         onChange={(e) => setPart('year', e.target.value)}
         aria-label="Rok urodzenia"

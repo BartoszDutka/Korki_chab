@@ -11,6 +11,7 @@ import { enrollmentsService } from './enrollmentsService'
 import { messagesService } from './messagesService'
 import { emailSettingsService, DEFAULT_EMAIL_SETTINGS } from './emailSettingsService'
 import { sendEnrollmentEmails, sendMessageNotification } from './emailService'
+import { reserveCourseSeats, releaseCourseSeats } from './courseSeatsService'
 
 const now = () => new Date().toISOString()
 
@@ -64,6 +65,19 @@ export async function submitEnrollment(input: SubmitEnrollmentInput): Promise<En
   const timestamp = now()
   const participantData = cleanParticipantData(input.participantData)
   const contactData = cleanContactData(input.contactData)
+  const courseIds = [...new Set(input.selectedCourses.map((c) => c.courseId))]
+
+  try {
+    await reserveCourseSeats(courseIds)
+  } catch (err) {
+    const message = (err as Error).message
+    if (message === 'course-full') {
+      const e = new Error('Brak wolnych miejsc na wybrane zajęcia.') as Error & { code?: string }
+      e.code = 'course-full'
+      throw e
+    }
+    throw err
+  }
 
   const enrollmentData: Omit<Enrollment, 'id'> = {
     userId: input.userId,
@@ -79,7 +93,13 @@ export async function submitEnrollment(input: SubmitEnrollmentInput): Promise<En
     updatedAt: timestamp,
   }
 
-  const enrollmentId = await enrollmentsService.add(enrollmentData)
+  let enrollmentId: string
+  try {
+    enrollmentId = await enrollmentsService.add(enrollmentData)
+  } catch (err) {
+    await releaseCourseSeats(courseIds).catch(() => {})
+    throw err
+  }
   const enrollment: Enrollment = { id: enrollmentId, ...enrollmentData }
 
   const messageData: Omit<Message, 'id'> = {

@@ -1,11 +1,18 @@
-import type { Course, CourseStatus, Enrollment, SelectedCourse } from '../types'
+import type { Course, CourseStatus, Enrollment, EnrollmentStatus, SelectedCourse } from '../types'
 
-export function countConfirmedSeatsForCourse(enrollments: Enrollment[], courseId: string): number {
+const RESERVED_ENROLLMENT_STATUSES: EnrollmentStatus[] = ['sent', 'in_contact', 'confirmed']
+
+export function countReservedSeatsForCourse(enrollments: Enrollment[], courseId: string): number {
   return enrollments.filter(
     (e) =>
-      e.status === 'confirmed' &&
+      RESERVED_ENROLLMENT_STATUSES.includes(e.status) &&
       e.selectedCourses.some((c) => c.courseId === courseId),
   ).length
+}
+
+/** @deprecated Użyj countReservedSeatsForCourse — liczy też zgłoszenia wysłane i w kontakcie. */
+export function countConfirmedSeatsForCourse(enrollments: Enrollment[], courseId: string): number {
+  return countReservedSeatsForCourse(enrollments, courseId)
 }
 
 export function computeSeatsAvailable(seatsLimit: number, confirmedCount: number): number {
@@ -24,8 +31,8 @@ export function enrichCourseWithSeats(course: Course, confirmedCount: number): C
 
 export function enrichCoursesWithSeats(courses: Course[], enrollments: Enrollment[]): Course[] {
   return courses.map((course) => {
-    const confirmed = countConfirmedSeatsForCourse(enrollments, course.id)
-    return enrichCourseWithSeats(course, confirmed)
+    const reserved = countReservedSeatsForCourse(enrollments, course.id)
+    return enrichCourseWithSeats(course, reserved)
   })
 }
 

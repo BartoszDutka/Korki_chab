@@ -1,7 +1,9 @@
-import { useState } from 'react'
-import type { Course, SelectedCourse } from '../../types'
+import { useEffect, useState } from 'react'
+import type { Course, ParticipantProfile, SelectedCourse } from '../../types'
 import { submitEnrollment } from '../../services/enrollmentFlowService'
 import { courseToSelectedCourse } from '../../lib/courseUtils'
+import { usersService } from '../../services/usersService'
+import { useAuth } from '../../contexts/AuthContext'
 import { inputClass } from '../admin/AdminUi'
 import BirthDateInput from './BirthDateInput'
 
@@ -33,6 +35,16 @@ export const emptyEnrollmentForm = (email = '', name = ''): EnrollmentFormData =
   rodoAccepted: false,
 })
 
+function applyParticipantProfile(form: EnrollmentFormData, profile: ParticipantProfile): EnrollmentFormData {
+  return {
+    ...form,
+    participantFirstName: profile.firstName,
+    participantLastName: profile.lastName,
+    participantBirthDate: profile.birthDate ?? '',
+    studentClass: profile.studentClass,
+  }
+}
+
 export default function EnrollmentForm({
   courses,
   userId,
@@ -52,12 +64,42 @@ export default function EnrollmentForm({
   onSuccess: () => void
   onCancel?: () => void
 }) {
+  const { profile } = useAuth()
   const [form, setForm] = useState<EnrollmentFormData>(emptyEnrollmentForm(userEmail, userName))
+  const [selectedProfileId, setSelectedProfileId] = useState('')
+  const [saveParticipantForFuture, setSaveParticipantForFuture] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
+  const savedProfiles =
+    userId && profile?.uid === userId ? (profile.participantProfiles ?? []) : []
+
+  useEffect(() => {
+    setForm(emptyEnrollmentForm(userEmail, userName))
+    setSelectedProfileId('')
+    setSaveParticipantForFuture(false)
+  }, [userEmail, userName, userId])
+
   const set = (key: keyof EnrollmentFormData, value: string | boolean) =>
     setForm((f) => ({ ...f, [key]: value }))
+
+  const handleProfileSelect = (profileId: string) => {
+    setSelectedProfileId(profileId)
+    if (!profileId) {
+      setForm((f) => ({
+        ...f,
+        participantFirstName: '',
+        participantLastName: '',
+        participantBirthDate: '',
+        studentClass: '',
+      }))
+      return
+    }
+    const picked = savedProfiles.find((p) => p.id === profileId)
+    if (picked) {
+      setForm((f) => applyParticipantProfile(f, picked))
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -93,10 +135,22 @@ export default function EnrollmentForm({
         },
         messageType,
       })
+
+      if (userId && saveParticipantForFuture) {
+        await usersService.saveParticipantProfile(userId, {
+          firstName: form.participantFirstName,
+          lastName: form.participantLastName,
+          birthDate: form.participantBirthDate || undefined,
+          studentClass: form.studentClass,
+        })
+      }
+
       onSuccess()
     } catch (err) {
       const code = (err as { code?: string }).code
-      if (code === 'permission-denied') {
+      if (code === 'course-full') {
+        setError('Brak wolnych miejsc na wybrane zajęcia. Odśwież stronę i spróbuj ponownie.')
+      } else if (code === 'permission-denied') {
         setError('Brak uprawnień do zapisu. Zaloguj się ponownie lub skontaktuj się z nami telefonicznie.')
       } else {
         setError('Nie udało się wysłać zgłoszenia. Spróbuj ponownie.')
@@ -120,6 +174,29 @@ export default function EnrollmentForm({
         </ul>
       </div>
 
+      {savedProfiles.length > 0 && (
+        <div>
+          <label className="block">
+            <span className="text-label-sm font-medium">Zapisany uczestnik</span>
+            <select
+              className={inputClass}
+              value={selectedProfileId}
+              onChange={(e) => handleProfileSelect(e.target.value)}
+            >
+              <option value="">Wpisz dane ręcznie</option>
+              {savedProfiles.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <p className="text-label-sm text-on-surface-variant mt-1">
+            Wybierz profil uczestnika z konta lub wpisz dane ręcznie poniżej.
+          </p>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <label className="block">
           <span className="text-label-sm font-medium">Imię uczestnika *</span>
@@ -129,14 +206,13 @@ export default function EnrollmentForm({
           <span className="text-label-sm font-medium">Nazwisko uczestnika *</span>
           <input className={inputClass} required value={form.participantLastName} onChange={(e) => set('participantLastName', e.target.value)} />
         </label>
-        <label className="block sm:col-span-2">
+        <div className="block sm:col-span-2">
           <span className="text-label-sm font-medium">Data urodzenia (opcjonalnie)</span>
           <BirthDateInput
-            className={inputClass}
             value={form.participantBirthDate}
             onChange={(v) => set('participantBirthDate', v)}
           />
-        </label>
+        </div>
         <label className="block">
           <span className="text-label-sm font-medium">Klasa ucznia *</span>
           <input className={inputClass} required value={form.studentClass} onChange={(e) => set('studentClass', e.target.value)} />
@@ -158,6 +234,20 @@ export default function EnrollmentForm({
           <input type="tel" className={inputClass} required value={form.phone} onChange={(e) => set('phone', e.target.value)} />
         </label>
       </div>
+
+      {userId && !isGuest && (
+        <label className="flex items-start gap-2">
+          <input
+            type="checkbox"
+            checked={saveParticipantForFuture}
+            onChange={(e) => setSaveParticipantForFuture(e.target.checked)}
+            className="mt-1"
+          />
+          <span className="text-body-sm">
+            Zapamiętaj dane uczestnika w moim koncie na przyszłe zapisy
+          </span>
+        </label>
+      )}
 
       <label className="block">
         <span className="text-label-sm font-medium">Wiadomość dodatkowa</span>

@@ -254,6 +254,18 @@ export interface Enrollment {
   updatedAt: string
 }
 
+/** Zapisany profil uczestnika zajęć (dziecka) w koncie rodzica. */
+export interface ParticipantProfile {
+  id: string
+  firstName: string
+  lastName: string
+  birthDate?: string
+  studentClass: string
+  label: string
+  createdAt: string
+  updatedAt: string
+}
+
 export interface UserProfile {
   uid: string
   displayName: string
@@ -261,6 +273,7 @@ export interface UserProfile {
   photoURL?: string
   phone?: string
   role: UserRole
+  participantProfiles?: ParticipantProfile[]
   createdAt: string
   updatedAt: string
 }

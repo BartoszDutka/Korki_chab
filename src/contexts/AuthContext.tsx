@@ -26,6 +26,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let unsub: (() => void) | undefined
+    let unsubProfile: (() => void) | undefined
 
     const start = async () => {
       const [{ onAuthStateChanged }, auth] = await Promise.all([
@@ -34,6 +35,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ])
       const { usersService } = await import('../services/usersService')
       unsub = onAuthStateChanged(auth, async (u) => {
+        unsubProfile?.()
+        unsubProfile = undefined
         setUser(u)
         if (u) {
           const p = await usersService.createOrUpdate(u.uid, {
@@ -42,6 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             photoURL: u.photoURL ?? undefined,
           })
           setProfile(p)
+          unsubProfile = usersService.subscribe(u.uid, setProfile)
         } else {
           setProfile(null)
         }
@@ -57,6 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => {
       unsub?.()
+      unsubProfile?.()
     }
   }, [])
 

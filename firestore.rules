@@ -83,9 +83,26 @@ service cloud.firestore {
     }
 
     match /courses/{docId} {
+      function isSeatReservationUpdate() {
+        return request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['seatsTaken', 'seatsAvailable', 'status', 'updatedAt']) &&
+          request.resource.data.seatsTaken == resource.data.seatsTaken + 1 &&
+          request.resource.data.seatsAvailable == resource.data.seatsAvailable - 1 &&
+          resource.data.seatsAvailable > 0;
+      }
+
+      function isSeatReleaseUpdate() {
+        return request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['seatsTaken', 'seatsAvailable', 'status', 'updatedAt']) &&
+          request.resource.data.seatsTaken == resource.data.seatsTaken - 1 &&
+          request.resource.data.seatsAvailable == resource.data.seatsAvailable + 1 &&
+          resource.data.seatsTaken > 0;
+      }
+
       allow read: if isAdmin() ||
         (resource.data.visible == true && resource.data.status in ['active', 'full']);
-      allow write: if isAdmin();
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || isSeatReservationUpdate() || isSeatReleaseUpdate();
     }
 
     match /users/{uid} {

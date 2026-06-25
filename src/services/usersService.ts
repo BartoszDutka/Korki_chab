@@ -1,6 +1,6 @@
 import type { Unsubscribe } from 'firebase/firestore'
 import { getDb } from '../lib/firebase'
-import type { UserProfile, UserRole } from '../types'
+import type { ParticipantProfile, UserProfile, UserRole } from '../types'
 import { isAdminEmail } from '../types'
 
 const COL = 'users'
@@ -54,9 +54,10 @@ export async function createOrUpdateUserProfile(
     uid,
     displayName: data.displayName,
     email: data.email,
-    photoURL: data.photoURL,
+    photoURL: data.photoURL ?? existing?.photoURL,
     phone: data.phone ?? existing?.phone,
     role,
+    participantProfiles: existing?.participantProfiles,
     createdAt: existing?.createdAt ?? now,
     updatedAt: now,
   }
@@ -66,8 +67,75 @@ export async function createOrUpdateUserProfile(
   return profile
 }
 
+function participantLabel(firstName: string, lastName: string, studentClass: string): string {
+  const name = `${firstName} ${lastName}`.trim()
+  return studentClass ? `${name} (klasa ${studentClass})` : name
+}
+
+export async function saveParticipantProfile(
+  uid: string,
+  data: {
+    firstName: string
+    lastName: string
+    birthDate?: string
+    studentClass: string
+  },
+): Promise<ParticipantProfile> {
+  const existing = await getUserProfile(uid)
+  if (!existing) throw new Error('user-not-found')
+
+  const now = new Date().toISOString()
+  const firstName = data.firstName.trim()
+  const lastName = data.lastName.trim()
+  const studentClass = data.studentClass.trim()
+  const birthDate = data.birthDate?.trim() || undefined
+
+  const profiles = [...(existing.participantProfiles ?? [])]
+  const duplicateIndex = profiles.findIndex(
+    (p) =>
+      p.firstName.toLowerCase() === firstName.toLowerCase() &&
+      p.lastName.toLowerCase() === lastName.toLowerCase() &&
+      (p.birthDate ?? '') === (birthDate ?? ''),
+  )
+
+  let saved: ParticipantProfile
+  if (duplicateIndex >= 0) {
+    saved = {
+      ...profiles[duplicateIndex],
+      firstName,
+      lastName,
+      studentClass,
+      birthDate,
+      label: participantLabel(firstName, lastName, studentClass),
+      updatedAt: now,
+    }
+    profiles[duplicateIndex] = saved
+  } else {
+    saved = {
+      id: crypto.randomUUID(),
+      firstName,
+      lastName,
+      studentClass,
+      birthDate,
+      label: participantLabel(firstName, lastName, studentClass),
+      createdAt: now,
+      updatedAt: now,
+    }
+    profiles.push(saved)
+  }
+
+  const [{ doc, setDoc }, db] = await Promise.all([import('firebase/firestore'), getDb()])
+  await setDoc(
+    doc(db, COL, uid),
+    { participantProfiles: profiles, updatedAt: now },
+    { merge: true },
+  )
+  return saved
+}
+
 export const usersService = {
   get: getUserProfile,
   subscribe: subscribeUserProfile,
   createOrUpdate: createOrUpdateUserProfile,
+  saveParticipantProfile,
 }
