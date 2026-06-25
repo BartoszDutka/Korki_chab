@@ -2,9 +2,7 @@ import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import Icon, { Button } from '../components/ui'
 import EditableText from '../components/live-edit/EditableText'
-import OptimizedImage from '../components/OptimizedImage'
-import PageLoader from '../components/PageLoader'
-import { useFirestoreDocOnce, useFirestoreCollectionOnce } from '../hooks/useFirestore'
+import { useDeferredOnce } from '../hooks/useDeferredOnce'
 import { useSeo } from '../hooks/useSeo'
 import { SITE_URL } from '../lib/seo'
 import { settingsService } from '../services/settingsService'
@@ -16,18 +14,27 @@ import { IMAGES } from '../data/content'
 import DataSetupBanner from '../components/DataSetupBanner'
 
 export default function HomePage() {
-  const { data: settingsRaw, loading: settingsLoading } = useFirestoreDocOnce(settingsService.get)
-  const { data: seoRaw } = useFirestoreDocOnce(seoService.get)
-  const { allItems: posts } = useFirestoreCollectionOnce(postsService.getAll)
-  const { items: subjects } = useFirestoreCollectionOnce(subjectsService.getAll, true)
+  const { data: settingsRaw, settled: settingsSettled } = useDeferredOnce(settingsService.get)
+  const { data: seoRaw } = useDeferredOnce(seoService.get)
+  const { data: postsRaw } = useDeferredOnce(postsService.getAll)
+  const { data: subjectsRaw } = useDeferredOnce(subjectsService.getAll)
 
   const settings = settingsRaw ?? DEFAULT_SITE_SETTINGS
   const seo = seoRaw
-  const usingDefaults = !settingsLoading && !settingsRaw
+  const usingDefaults = settingsSettled && !settingsRaw
 
-  const publishedPosts = posts
-    .filter((p) => p.status === 'published')
-    .slice(0, 3)
+  const publishedPosts = useMemo(
+    () =>
+      (postsRaw ?? [])
+        .filter((p) => p.status === 'published')
+        .slice(0, 3),
+    [postsRaw],
+  )
+
+  const subjects = useMemo(
+    () => (subjectsRaw ?? []).filter((s) => s.visible !== false).sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
+    [subjectsRaw],
+  )
 
   const jsonLd = useMemo(
     () => ({
@@ -57,16 +64,12 @@ export default function HomePage() {
     jsonLd,
   })
 
-  if (settingsLoading && !settingsRaw) {
-    return <PageLoader label="Ładowanie strony…" />
-  }
-
   return (
     <>
       {usingDefaults && <DataSetupBanner />}
       <section className="py-12 md:py-section-gap px-margin-mobile md:px-margin-desktop bg-surface-container-lowest">
         <div className="max-w-container-max mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-          <div className="flex flex-col items-start space-y-6 md:space-y-8">
+          <div className="flex flex-col items-start space-y-6 md:space-y-8 min-h-[280px] sm:min-h-[320px]">
             <p className="text-label-md text-on-secondary-container font-bold uppercase tracking-wider">
               <EditableText
                 value={settings.heroSubtitle}
@@ -103,15 +106,28 @@ export default function HomePage() {
               ))}
             </div>
           </div>
-          <div className="relative h-[300px] sm:h-[400px] lg:h-[550px] w-full rounded-2xl overflow-hidden shadow-sm bg-academic-navy-deep">
-            <OptimizedImage
-              className="object-cover w-full h-full absolute inset-0 opacity-90"
-              alt="Sala lekcyjna w Centrum Korepetycji Chabówka — korepetycje w Podhalu"
-              src={IMAGES.hero}
-              priority
-              width={800}
-              height={550}
-            />
+          <div
+            className="relative hidden lg:block h-[400px] lg:h-[550px] w-full rounded-2xl overflow-hidden shadow-sm bg-academic-navy-deep"
+            aria-hidden="true"
+          >
+            <picture>
+              <source type="image/webp" srcSet={IMAGES.heroWebpSrcSet} sizes="(min-width: 1024px) 600px, 0px" />
+              <img
+                src={IMAGES.heroJpg}
+                alt=""
+                width={800}
+                height={550}
+                loading="lazy"
+                decoding="async"
+                fetchPriority="low"
+                sizes="(min-width: 1024px) 600px, 0px"
+                className="object-cover w-full h-full absolute inset-0 opacity-90"
+                onError={(e) => {
+                  const img = e.currentTarget
+                  if (img.src !== IMAGES.heroRemote) img.src = IMAGES.heroRemote
+                }}
+              />
+            </picture>
           </div>
         </div>
       </section>

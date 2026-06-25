@@ -28,7 +28,7 @@ export function Button({
 
   const variants = {
     primary:
-      'bg-secondary-container hover:bg-warm-orange-hover text-on-secondary px-6 py-3 md:px-8 md:py-4 font-bold shadow-sm',
+      'bg-secondary-container hover:bg-warm-orange-hover text-primary px-6 py-3 md:px-8 md:py-4 font-bold shadow-sm',
     secondary:
       'border-2 border-primary text-primary hover:bg-surface-container-low px-6 py-3 md:px-8 md:py-4 font-bold',
     ghost: 'border-2 border-white/30 text-white hover:bg-white/10 px-6 py-3 md:px-8 md:py-4 font-bold',

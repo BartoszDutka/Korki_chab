@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom'
-import { useFirestoreDocOnce } from '../hooks/useFirestore'
+import { useDeferredOnce } from '../hooks/useDeferredOnce'
 import { footerService } from '../services/footerService'
 import { DEFAULT_FOOTER } from '../data/defaults'
 
 export default function Footer() {
-  const { data: footerRaw } = useFirestoreDocOnce(footerService.get)
+  const { data: footerRaw } = useDeferredOnce(footerService.get)
   const footer = footerRaw ?? DEFAULT_FOOTER
 
   return (

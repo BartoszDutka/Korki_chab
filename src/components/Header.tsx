@@ -1,12 +1,12 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useCart } from '../contexts/CartContext'
 import Icon from './ui'
-import { useFirestoreDocOnce, useFirestoreCollectionOnce } from '../hooks/useFirestore'
+import { useDeferredOnce } from '../hooks/useDeferredOnce'
 import { menuService } from '../services/menuService'
 import { settingsService } from '../services/settingsService'
-import { DEFAULT_MENU } from '../data/defaults'
+import { DEFAULT_MENU, DEFAULT_SITE_SETTINGS } from '../data/defaults'
 
 const LOGO_SRC = '/LogoChab.png'
 
@@ -59,11 +59,16 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const { user, isAdmin, logout, signInWithGoogle } = useAuth()
   const { count } = useCart()
-  const { data: settings } = useFirestoreDocOnce(settingsService.get)
-  const { items: menuFromDb, loading: menuLoading } = useFirestoreCollectionOnce(menuService.getAll, true)
-  const menuItems = menuFromDb.length > 0 ? menuFromDb : DEFAULT_MENU
+  const { data: settingsDeferred } = useDeferredOnce(settingsService.get)
+  const { data: menuDeferred, settled: menuSettled } = useDeferredOnce(menuService.getAll)
+  const menuItems = useMemo(() => {
+    const items = menuDeferred ?? []
+    if (items.length === 0) return DEFAULT_MENU
+    return [...items].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+  }, [menuDeferred])
+  const menuLoading = !menuSettled
 
-  const siteName = settings?.siteName ?? 'Centrum Chabówka'
+  const siteName = settingsDeferred?.siteName ?? DEFAULT_SITE_SETTINGS.siteName
   const desktopMenuItems = menuItems.filter((item) => item.href !== '/zajecia')
   const closeMenu = () => setMenuOpen(false)
 
@@ -170,7 +175,7 @@ export default function Header() {
         className={`fixed top-0 right-0 h-full w-full max-w-xs bg-surface-container-lowest z-50 shadow-2xl transition-transform duration-300 lg:hidden flex flex-col ${
           menuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
-        aria-hidden={!menuOpen}
+        {...(!menuOpen ? { inert: true } : {})}
       >
         <div className="flex justify-between items-center gap-3 p-4 border-b border-outline-variant">
           <Link to="/" className="flex items-center gap-2 min-w-0" onClick={closeMenu} aria-label={siteName}>

@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState, useMemo, useCallback, type ReactNode } from 'react'
 import {
-  onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   updateProfile,
@@ -34,20 +33,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    return onAuthStateChanged(auth, async (u) => {
-      setUser(u)
-      if (u) {
-        const p = await usersService.createOrUpdate(u.uid, {
-          displayName: u.displayName ?? u.email ?? 'Użytkownik',
-          email: u.email ?? '',
-          photoURL: u.photoURL ?? undefined,
+    let unsub: (() => void) | undefined
+    let cancelled = false
+
+    const start = () => {
+      import('firebase/auth').then(({ onAuthStateChanged }) => {
+        if (cancelled) return
+        unsub = onAuthStateChanged(auth, async (u) => {
+          setUser(u)
+          if (u) {
+            const p = await usersService.createOrUpdate(u.uid, {
+              displayName: u.displayName ?? u.email ?? 'Użytkownik',
+              email: u.email ?? '',
+              photoURL: u.photoURL ?? undefined,
+            })
+            setProfile(p)
+          } else {
+            setProfile(null)
+          }
+          setLoading(false)
         })
-        setProfile(p)
-      } else {
-        setProfile(null)
-      }
-      setLoading(false)
-    })
+      })
+    }
+
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(start, { timeout: 2500 })
+    } else {
+      globalThis.setTimeout(start, 300)
+    }
+
+    return () => {
+      cancelled = true
+      unsub?.()
+    }
   }, [])
 
   const login = useCallback(async (email: string, password: string) => {

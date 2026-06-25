@@ -166,6 +166,7 @@ export default function KontaktPage() {
               className="w-full h-full object-cover"
               width={600}
               height={400}
+              sizes="(max-width: 768px) 100vw, 1200px"
             />
           </div>
           {contact.googleMapsUrl && (

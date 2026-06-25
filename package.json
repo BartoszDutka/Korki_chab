@@ -9,7 +9,8 @@
     "preview": "vite preview",
     "seed": "npx tsx scripts/seed.ts",
     "seed:posts": "npx tsx scripts/seed-posts.ts",
-    "seed:courses": "npx tsx scripts/seed-courses.ts"
+    "seed:courses": "npx tsx scripts/seed-courses.ts",
+    "optimize:images": "node scripts/optimize-images.mjs"
   },
   "dependencies": {
     "@fontsource/manrope": "^5.2.8",
