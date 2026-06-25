@@ -140,12 +140,18 @@ export default function EnrollmentForm({
       })
 
       if (userId && saveParticipantForFuture) {
-        await usersService.saveParticipantProfile(userId, {
-          firstName: form.participantFirstName,
-          lastName: form.participantLastName,
-          birthDate: form.participantBirthDate || undefined,
-          studentClass: form.studentClass,
-        })
+        try {
+          await usersService.saveParticipantProfile(userId, {
+            firstName: form.participantFirstName,
+            lastName: form.participantLastName,
+            birthDate: form.participantBirthDate || undefined,
+            studentClass: form.studentClass,
+          })
+        } catch (profileErr) {
+          if (import.meta.env.DEV) {
+            console.warn('Nie udało się zapisać profilu uczestnika:', profileErr)
+          }
+        }
       }
 
       onSuccess()
@@ -158,9 +164,7 @@ export default function EnrollmentForm({
       } else {
         setError('Nie udało się wysłać zgłoszenia. Spróbuj ponownie.')
       }
-      if (import.meta.env.DEV) {
-        console.error('Enrollment submit failed:', err)
-      }
+      console.error('Enrollment submit failed:', err)
     } finally {
       setSubmitting(false)
     }

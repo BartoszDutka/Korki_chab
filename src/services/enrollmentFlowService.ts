@@ -61,6 +61,10 @@ export interface SubmitEnrollmentInput {
   messageType: MessageType
 }
 
+function stripUndefined<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value)) as T
+}
+
 export async function submitEnrollment(input: SubmitEnrollmentInput): Promise<Enrollment> {
   const timestamp = now()
   const participantData = cleanParticipantData(input.participantData)
@@ -70,13 +74,20 @@ export async function submitEnrollment(input: SubmitEnrollmentInput): Promise<En
   try {
     await reserveCourseSeats(courseIds)
   } catch (err) {
+    const code = (err as { code?: string }).code
     const message = (err as Error).message
     if (message === 'course-full') {
       const e = new Error('Brak wolnych miejsc na wybrane zajęcia.') as Error & { code?: string }
       e.code = 'course-full'
       throw e
     }
-    throw err
+    if (code === 'permission-denied') {
+      if (import.meta.env.DEV) {
+        console.warn('Rezerwacja miejsc pominięta (brak uprawnień Firestore). Opublikuj firestore.rules.', err)
+      }
+    } else {
+      throw err
+    }
   }
 
   const enrollmentData: Omit<Enrollment, 'id'> = {
@@ -95,7 +106,7 @@ export async function submitEnrollment(input: SubmitEnrollmentInput): Promise<En
 
   let enrollmentId: string
   try {
-    enrollmentId = await enrollmentsService.add(enrollmentData)
+    enrollmentId = await enrollmentsService.add(stripUndefined(enrollmentData))
   } catch (err) {
     await releaseCourseSeats(courseIds).catch(() => {})
     throw err
@@ -123,7 +134,13 @@ export async function submitEnrollment(input: SubmitEnrollmentInput): Promise<En
     updatedAt: timestamp,
   }
 
-  await messagesService.add(messageData)
+  try {
+    await messagesService.add(stripUndefined(messageData))
+  } catch (err) {
+    if (import.meta.env.DEV) {
+      console.warn('Nie udało się zapisać powiadomienia w messages:', err)
+    }
+  }
 
   const emailSettings = await getEmailSettingsSafe()
   try {

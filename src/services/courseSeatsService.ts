@@ -19,7 +19,9 @@ export async function reserveCourseSeat(courseId: string): Promise<void> {
     const course = snap.data()
     const seatsLimit = Number(course.seatsLimit ?? 0)
     const seatsTaken = Number(course.seatsTaken ?? 0)
-    const seatsAvailable = computeSeatsAvailable(seatsLimit, seatsTaken)
+    const seatsAvailable = Number(
+      course.seatsAvailable ?? computeSeatsAvailable(seatsLimit, seatsTaken),
+    )
     if (seatsAvailable <= 0) throw new Error('course-full')
     const nextTaken = seatsTaken + 1
     const nextAvailable = seatsAvailable - 1
@@ -41,9 +43,12 @@ export async function releaseCourseSeat(courseId: string): Promise<void> {
     const course = snap.data()
     const seatsLimit = Number(course.seatsLimit ?? 0)
     const seatsTaken = Number(course.seatsTaken ?? 0)
+    const seatsAvailable = Number(
+      course.seatsAvailable ?? computeSeatsAvailable(seatsLimit, seatsTaken),
+    )
     if (seatsTaken <= 0) return
     const nextTaken = seatsTaken - 1
-    const nextAvailable = computeSeatsAvailable(seatsLimit, nextTaken)
+    const nextAvailable = seatsAvailable + 1
     tx.update(ref, {
       seatsTaken: nextTaken,
       seatsAvailable: nextAvailable,

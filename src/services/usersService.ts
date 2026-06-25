@@ -82,15 +82,13 @@ export async function saveParticipantProfile(
   },
 ): Promise<ParticipantProfile> {
   const existing = await getUserProfile(uid)
-  if (!existing) throw new Error('user-not-found')
-
   const now = new Date().toISOString()
   const firstName = data.firstName.trim()
   const lastName = data.lastName.trim()
   const studentClass = data.studentClass.trim()
   const birthDate = data.birthDate?.trim() || undefined
 
-  const profiles = [...(existing.participantProfiles ?? [])]
+  const profiles = [...(existing?.participantProfiles ?? [])]
   const duplicateIndex = profiles.findIndex(
     (p) =>
       p.firstName.toLowerCase() === firstName.toLowerCase() &&
