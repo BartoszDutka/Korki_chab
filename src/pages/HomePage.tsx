@@ -108,26 +108,26 @@ export default function HomePage() {
           </div>
           <div
             className="relative hidden lg:block h-[400px] lg:h-[550px] w-full rounded-2xl overflow-hidden shadow-sm bg-academic-navy-deep"
-            aria-hidden="true"
           >
-            <picture>
-              <source type="image/webp" srcSet={IMAGES.heroWebpSrcSet} sizes="(min-width: 1024px) 600px, 0px" />
-              <img
-                src={IMAGES.heroJpg}
-                alt=""
-                width={800}
-                height={550}
-                loading="lazy"
-                decoding="async"
-                fetchPriority="low"
-                sizes="(min-width: 1024px) 600px, 0px"
-                className="object-cover w-full h-full absolute inset-0 opacity-90"
-                onError={(e) => {
-                  const img = e.currentTarget
-                  if (img.src !== IMAGES.heroRemote) img.src = IMAGES.heroRemote
-                }}
-              />
-            </picture>
+            <img
+              src={IMAGES.heroRemote}
+              alt="Nowoczesna sala lekcyjna w Centrum Korepetycji Chabówka"
+              width={800}
+              height={550}
+              loading="eager"
+              decoding="async"
+              fetchPriority="high"
+              sizes="(min-width: 1024px) 600px, 0px"
+              className="object-cover w-full h-full absolute inset-0 opacity-90"
+              referrerPolicy="no-referrer"
+              onError={(e) => {
+                const img = e.currentTarget
+                if (!img.dataset.triedLocal) {
+                  img.dataset.triedLocal = '1'
+                  img.src = IMAGES.heroJpg
+                }
+              }}
+            />
           </div>
         </div>
       </section>

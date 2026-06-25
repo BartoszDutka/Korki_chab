@@ -3,7 +3,7 @@ export const IMAGES = {
   heroWebp: '/hero-800.webp',
   heroWebpSrcSet: '/hero-480.webp 480w, /hero-800.webp 800w, /hero-1200.webp 1200w',
   heroJpg: '/hero.jpg',
-  /** Zewnętrzny fallback gdy brak lokalnych plików */
+  /** Domyślne zdjęcie hero — działa bez plików w public/ */
   heroRemote:
     'https://lh3.googleusercontent.com/aida-public/AB6AXuDJjwIqDmAGDJxF3UkJNKnzrdbRfYEIDjVW8nFpgrtmW2GJfHIumc1lHZI_kWVa_Ap5i7siDy4b9Qkua_-jWBSHKXzuLKl9h_VqjfjMIIMzdsg1iPE3zgmaO_PblQuxUyCfnEjOxHkMjnlDiwcbhhGN0As8hnUCMExDkoKxvN4lbSyuVXjC-C-zXzrprKR6QKIwvTHSYjYwujxroOkYgoY7d7QNz5MO0_qBnDKKOWMlbY5LZeNv_FTMBh3wdB_h7O--1mCwFIzFXoA',
   team: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAhiQfpaQVSRL9DJPYiXr9LKiRKTrxUWq1_tW7S6bVroOfPwzWm4dniVFxM2aS0YE1rbodzw3-RZqzB5iNQSqHgqC7VJzVFIso083Rodh1SW5DEtryinAAuhdcWlQE2Ua72_f0vvJ37WCOEgC1a82yiEO6bSejMhevd9SDXebEtZKhWxl_Z17W7Xki6Ho9ji1ZNnV9uWwCH6mRCNYf9aQmxLiHsdZkqjzlelTwguZA0TuAvtGZzoMjOGP9Nq3hbvk2uvShye7g68rY',
