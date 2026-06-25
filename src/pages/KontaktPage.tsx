@@ -171,13 +171,14 @@ export default function KontaktPage() {
           <h2 className="text-headline-md font-bold text-primary mb-4 md:mb-6">Nasza lokalizacja</h2>
           <div className="relative aspect-video rounded-2xl overflow-hidden border border-outline-variant shadow-sm bg-surface-container-low">
             <OptimizedImage
-              src={IMAGES.mapDesktop}
+              src={IMAGES.mapLocal}
               alt="Mapa dojazdu do Centrum Korepetycji Chabówka"
               className="w-full h-full object-cover"
               width={1200}
               height={675}
               sizes="(max-width: 768px) 100vw, 1200px"
               aspectRatio="16/9"
+              fallbackSrc={IMAGES.mapDesktop}
             />
           </div>
           {contact.googleMapsUrl && (

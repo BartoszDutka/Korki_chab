@@ -144,14 +144,14 @@ export default function HomePage() {
           </div>
           <div className="hidden lg:block w-full max-h-[550px] rounded-2xl overflow-hidden shadow-sm bg-academic-navy-deep">
             <ImageWithAspectRatio
-              src={IMAGES.heroRemote}
+              src={IMAGES.heroJpg}
               alt="Nowoczesna sala lekcyjna w Centrum Korepetycji Chabówka"
               width={800}
               height={550}
               priority
               sizes="(min-width: 1024px) 600px, 0px"
               webpSrc={IMAGES.heroWebpSrcSet}
-              fallbackSrc={IMAGES.heroJpg}
+              fallbackSrc={IMAGES.heroRemote}
               className="opacity-90"
             />
           </div>

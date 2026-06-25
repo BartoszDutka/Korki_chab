@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 
 interface OptimizedImageProps {
   src: string
@@ -8,6 +8,7 @@ interface OptimizedImageProps {
   height?: number
   priority?: boolean
   sizes?: string
+  /** Lokalny srcSet WebP — używaj tylko gdy pliki istnieją w public/ */
   webpSrc?: string
   fallbackSrc?: string
   aspectRatio?: string
@@ -25,8 +26,15 @@ export default function OptimizedImage({
   fallbackSrc,
   aspectRatio,
 }: OptimizedImageProps) {
-  const [failed, setFailed] = useState(false)
-  const resolvedSrc = failed && fallbackSrc ? fallbackSrc : src
+  const sources = useMemo(() => {
+    const list = [src]
+    if (fallbackSrc && fallbackSrc !== src) list.push(fallbackSrc)
+    return list
+  }, [src, fallbackSrc])
+
+  const [sourceIndex, setSourceIndex] = useState(0)
+  const resolvedSrc = sources[sourceIndex] ?? src
+  const useLocalWebp = Boolean(webpSrc) && sourceIndex === 0 && resolvedSrc.startsWith('/')
   const loading = priority ? 'eager' : 'lazy'
   const fetchPriority: 'high' | 'low' = priority ? 'high' : 'low'
   const isExternal = resolvedSrc.startsWith('http')
@@ -45,11 +53,11 @@ export default function OptimizedImage({
     style: imgStyle,
     referrerPolicy: isExternal ? ('no-referrer' as const) : undefined,
     onError: () => {
-      if (fallbackSrc && !failed) setFailed(true)
+      setSourceIndex((i) => (i < sources.length - 1 ? i + 1 : i))
     },
   }
 
-  if (webpSrc && !failed) {
+  if (useLocalWebp && webpSrc) {
     return (
       <picture>
         <source type="image/webp" srcSet={webpSrc} sizes={sizes} />
