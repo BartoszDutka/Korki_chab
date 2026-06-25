@@ -13,7 +13,7 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   heroDescription:
     'Pomagamy uczniom szkoły podstawowej i średniej nadrabiać zaległości, poprawiać oceny i przygotowywać się do egzaminów.',
   heroButtons: [
-    { label: 'Zapisz się', href: '/kontakt' },
+    { label: 'Zapisz się', href: '/zajecia' },
     { label: 'Zadzwoń', href: 'tel:+48123456789' },
     { label: 'Zobacz aktualności', href: '/aktualnosci' },
   ],

@@ -170,15 +170,18 @@ export default function HomePage() {
               />
             </p>
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto min-h-[48px]">
-              {settings.heroButtons.map((btn) => (
+              {settings.heroButtons.map((btn) => {
+                const href = btn.label === 'Zapisz się' ? '/zajecia' : btn.href
+                return (
                 <Button
                   key={btn.label}
-                  href={btn.href.startsWith('tel:') ? btn.href : btn.href}
+                  href={href}
                   variant={btn.label === 'Zapisz się' ? 'primary' : 'secondary'}
                 >
                   {btn.label}
                 </Button>
-              ))}
+                )
+              })}
             </div>
           </div>
           <div className="hidden lg:block w-full max-h-[550px] rounded-2xl overflow-hidden shadow-sm bg-academic-navy-deep">
