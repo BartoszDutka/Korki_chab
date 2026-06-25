@@ -6,6 +6,7 @@ import CourseCard from '../components/courses/CourseCard'
 import CourseFilters, { defaultCourseFilters, filterCourses } from '../components/courses/CourseFilters'
 import type { Course } from '../types'
 import { useSeo } from '../hooks/useSeo'
+import { CourseCardSkeleton, GridSkeleton } from '../components/skeletons'
 import PageLoader from '../components/PageLoader'
 
 const CourseModal = lazy(() => import('../components/courses/CourseModal'))
@@ -52,7 +53,7 @@ export default function ZajeciaPage() {
         </p>
       </section>
 
-      <section className="py-section-gap px-margin-mobile md:px-margin-desktop">
+      <section className="py-section-gap px-margin-mobile md:px-margin-desktop min-h-[480px]">
         <div className="max-w-container-max mx-auto space-y-8">
           <CourseFilters
             filters={filters}
@@ -63,7 +64,9 @@ export default function ZajeciaPage() {
           />
 
           {coursesLoading ? (
-            <PageLoader label="Ładowanie zajęć…" />
+            <GridSkeleton count={3} columns="grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+              <CourseCardSkeleton />
+            </GridSkeleton>
           ) : rawCourses.length === 0 ? (
             <div className="text-center py-12 space-y-3">
               <p className="text-body-md text-on-surface-variant">

@@ -10,7 +10,6 @@ import { DEFAULT_CONTACT } from '../data/defaults'
 import { IMAGES } from '../data/content'
 import { useSeo } from '../hooks/useSeo'
 import OptimizedImage from '../components/OptimizedImage'
-import PageLoader from '../components/PageLoader'
 import { inputClass } from '../components/admin/AdminUi'
 import type { FormFieldConfig } from '../types'
 
@@ -44,7 +43,18 @@ export default function KontaktPage() {
     }, 1200)
   }
 
-  if (loading && !contactRaw) return <PageLoader label="Ładowanie kontaktu…" />
+  if (loading && !contactRaw) {
+    return (
+      <div className="min-h-[70vh] py-section-gap px-margin-mobile md:px-margin-desktop">
+        <div className="max-w-container-max mx-auto space-y-8">
+          <div className="text-center space-y-4">
+            <div className="h-10 w-64 mx-auto bg-surface-container-low rounded-lg animate-pulse" />
+            <div className="h-6 w-full max-w-2xl mx-auto bg-surface-container-low rounded-lg animate-pulse" />
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const visibleFields = formSettings?.fields.filter((f) => f.visible) ?? []
 
@@ -161,12 +171,13 @@ export default function KontaktPage() {
           <h2 className="text-headline-md font-bold text-primary mb-4 md:mb-6">Nasza lokalizacja</h2>
           <div className="relative aspect-video rounded-2xl overflow-hidden border border-outline-variant shadow-sm bg-surface-container-low">
             <OptimizedImage
-              src={IMAGES.mapMobile}
+              src={IMAGES.mapDesktop}
               alt="Mapa dojazdu do Centrum Korepetycji Chabówka"
               className="w-full h-full object-cover"
-              width={600}
-              height={400}
+              width={1200}
+              height={675}
               sizes="(max-width: 768px) 100vw, 1200px"
+              aspectRatio="16/9"
             />
           </div>
           {contact.googleMapsUrl && (

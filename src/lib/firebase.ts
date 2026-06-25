@@ -1,8 +1,8 @@
-import { initializeApp, getApps, getApp } from 'firebase/app'
-import { getFirestore } from 'firebase/firestore'
-import { getAuth } from 'firebase/auth'
-import { getStorage, type FirebaseStorage } from 'firebase/storage'
-import { getAnalytics, isSupported, type Analytics } from 'firebase/analytics'
+import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app'
+import { getFirestore, type Firestore } from 'firebase/firestore'
+import { getAuth, type Auth } from 'firebase/auth'
+import type { FirebaseStorage } from 'firebase/storage'
+import type { Analytics } from 'firebase/analytics'
 
 function env(key: string): string {
   if (typeof import.meta !== 'undefined' && import.meta.env?.[key]) {
@@ -21,15 +21,16 @@ const firebaseConfig = {
   measurementId: env('VITE_FIREBASE_MEASUREMENT_ID'),
 }
 
-export const app = getApps().length ? getApp() : initializeApp(firebaseConfig)
+export const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig)
 
-export const db = getFirestore(app)
-export const auth = getAuth(app)
+export const db: Firestore = getFirestore(app)
+export const auth: Auth = getAuth(app)
 
 let storageInstance: FirebaseStorage | null = null
 
-export function getFirebaseStorage(): FirebaseStorage {
+export async function getFirebaseStorage(): Promise<FirebaseStorage> {
   if (!storageInstance) {
+    const { getStorage } = await import('firebase/storage')
     storageInstance = getStorage(app)
   }
   return storageInstance
@@ -40,6 +41,7 @@ let analyticsInstance: Analytics | null = null
 export const initAnalytics = async (): Promise<Analytics | null> => {
   if (typeof window === 'undefined') return null
   if (analyticsInstance) return analyticsInstance
+  const { getAnalytics, isSupported } = await import('firebase/analytics')
   if (await isSupported()) {
     analyticsInstance = getAnalytics(app)
     return analyticsInstance

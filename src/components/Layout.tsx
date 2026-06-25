@@ -1,8 +1,21 @@
 import { Outlet } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
+import { useAuth } from '../contexts/AuthContext'
 import Header from './Header'
 import Footer from './Footer'
-import EditModeBar from './live-edit/EditModeBar'
 import SkipLink from './SkipLink'
+
+const EditModeBar = lazy(() => import('./live-edit/EditModeBar'))
+
+function AdminEditBar() {
+  const { isAdmin } = useAuth()
+  if (!isAdmin) return null
+  return (
+    <Suspense fallback={null}>
+      <EditModeBar />
+    </Suspense>
+  )
+}
 
 export default function Layout() {
   return (
@@ -13,7 +26,7 @@ export default function Layout() {
         <Outlet />
       </main>
       <Footer />
-      <EditModeBar />
+      <AdminEditBar />
     </div>
   )
 }

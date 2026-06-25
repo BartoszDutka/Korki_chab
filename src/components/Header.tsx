@@ -12,7 +12,7 @@ const LOGO_SRC = '/LogoChab.png'
 
 const FOOTER_ONLY_HREFS = ['/opinie', '/faq', '/kontakt']
 
-function SiteLogo({ className = 'h-9 lg:h-11 w-auto max-h-10 lg:max-h-12' }: { className?: string }) {
+function SiteLogo({ className = 'h-9 lg:h-11 w-9 lg:w-11' }: { className?: string }) {
   return (
     <img
       src={LOGO_SRC}
@@ -59,7 +59,7 @@ function NavItem({
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const { user, isAdmin, logout, signInWithGoogle } = useAuth()
+  const { user, isAdmin, logout, signInWithGoogle, loading: authLoading } = useAuth()
   const { count } = useCart()
   const { data: settingsDeferred } = useDeferredOnce(settingsService.get)
   const { data: menuDeferred, settled: menuSettled } = useDeferredOnce(menuService.getAll)
@@ -69,6 +69,12 @@ export default function Header() {
     return sorted.filter((item) => item.visible !== false && !FOOTER_ONLY_HREFS.includes(item.href))
   }, [menuDeferred])
   const menuLoading = !menuSettled
+  const navItems = useMemo(() => {
+    if (menuLoading) {
+      return DEFAULT_MENU.filter((item) => item.visible !== false && !FOOTER_ONLY_HREFS.includes(item.href))
+    }
+    return menuItems
+  }, [menuLoading, menuItems])
 
   const siteName = settingsDeferred?.siteName ?? DEFAULT_SITE_SETTINGS.siteName
   const closeMenu = () => setMenuOpen(false)
@@ -96,26 +102,30 @@ export default function Header() {
             </span>
           </Link>
 
-          <nav className="hidden lg:flex flex-1 justify-center items-center min-w-0 gap-0.5 xl:gap-1 overflow-hidden">
-            {!menuLoading &&
-              menuItems.map((item) => (
-                <NavItem key={item.id} href={item.href} label={item.label} compact />
-              ))}
+          <nav className="hidden lg:flex flex-1 justify-center items-center min-w-0 gap-0.5 xl:gap-1 overflow-hidden min-h-[44px]">
+            {navItems.map((item) => (
+              <NavItem key={item.id ?? item.href} href={item.href} label={item.label} compact />
+            ))}
           </nav>
 
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0 ml-auto">
-            {user && !isAdmin ? (
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0 ml-auto min-h-[44px] min-w-[44px] lg:min-w-[200px] justify-end">
+            {authLoading ? (
+              <div className="hidden lg:block w-[200px] h-[44px]" aria-hidden="true" />
+            ) : user && !isAdmin ? (
               <>
                 <Link
                   to="/koszyk"
                   className="hidden lg:inline-flex items-center gap-1 font-medium text-label-sm xl:text-label-md px-2 xl:px-3 py-2 rounded-lg text-primary hover:bg-surface-container-low whitespace-nowrap"
                 >
                   Koszyk
-                  {count > 0 && (
-                    <span className="bg-secondary-container text-on-secondary text-xs font-bold px-1.5 py-0.5 rounded-full">
-                      {count}
-                    </span>
-                  )}
+                  <span
+                    className={`bg-secondary-container text-on-secondary text-xs font-bold px-1.5 py-0.5 rounded-full min-w-[1.25rem] text-center ${
+                      count > 0 ? '' : 'invisible'
+                    }`}
+                    aria-hidden={count === 0}
+                  >
+                    {count > 0 ? count : 0}
+                  </span>
                 </Link>
                 <Link
                   to="/moje-zajecia"
@@ -187,7 +197,7 @@ export default function Header() {
         </div>
         <div className="flex flex-col p-4 gap-1 flex-1 overflow-y-auto">
           {menuItems.map((item) => (
-            <NavItem key={item.id} href={item.href} label={item.label} onNavigate={closeMenu} />
+            <NavItem key={item.id ?? item.href} href={item.href} label={item.label} onNavigate={closeMenu} />
           ))}
           <div className="mt-auto pt-4 border-t border-outline-variant flex flex-col gap-1">
           {user && !isAdmin ? (

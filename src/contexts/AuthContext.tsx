@@ -6,6 +6,7 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
   signOut,
+  onAuthStateChanged,
   type User,
 } from 'firebase/auth'
 import { auth } from '../lib/firebase'
@@ -34,25 +35,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let unsub: (() => void) | undefined
-    let cancelled = false
 
     const start = () => {
-      import('firebase/auth').then(({ onAuthStateChanged }) => {
-        if (cancelled) return
-        unsub = onAuthStateChanged(auth, async (u) => {
-          setUser(u)
-          if (u) {
-            const p = await usersService.createOrUpdate(u.uid, {
-              displayName: u.displayName ?? u.email ?? 'Użytkownik',
-              email: u.email ?? '',
-              photoURL: u.photoURL ?? undefined,
-            })
-            setProfile(p)
-          } else {
-            setProfile(null)
-          }
-          setLoading(false)
-        })
+      unsub = onAuthStateChanged(auth, async (u) => {
+        setUser(u)
+        if (u) {
+          const p = await usersService.createOrUpdate(u.uid, {
+            displayName: u.displayName ?? u.email ?? 'Użytkownik',
+            email: u.email ?? '',
+            photoURL: u.photoURL ?? undefined,
+          })
+          setProfile(p)
+        } else {
+          setProfile(null)
+        }
+        setLoading(false)
       })
     }
 
@@ -63,7 +60,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     return () => {
-      cancelled = true
       unsub?.()
     }
   }, [])

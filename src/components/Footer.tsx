@@ -8,7 +8,7 @@ export default function Footer() {
   const footer = footerRaw ?? DEFAULT_FOOTER
 
   return (
-    <footer className="bg-academic-navy-deep w-full py-12 md:py-section-gap">
+    <footer className="bg-academic-navy-deep w-full py-12 md:py-section-gap min-h-[320px]">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-gutter px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
         <div className="flex flex-col space-y-4 md:space-y-6">
           <div className="text-headline-md text-surface-container-lowest font-extrabold">

@@ -2,9 +2,7 @@ import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
 import PageLoader from './components/PageLoader'
-import AdminProtectedRoute from './components/admin/AdminProtectedRoute'
 import UserProtectedRoute from './components/UserProtectedRoute'
-import AdminLayout from './components/admin/AdminLayout'
 
 const HomePage = lazy(() => import('./pages/HomePage'))
 const PrzedmiotyPage = lazy(() => import('./pages/PrzedmiotyPage'))
@@ -19,6 +17,9 @@ const CourseDetailPage = lazy(() => import('./pages/CourseDetailPage'))
 const KoszykPage = lazy(() => import('./pages/KoszykPage'))
 const MojeZajeciaPage = lazy(() => import('./pages/MojeZajeciaPage'))
 const LoginPage = lazy(() => import('./pages/LoginPage'))
+
+const AdminProtectedRoute = lazy(() => import('./components/admin/AdminProtectedRoute'))
+const AdminLayout = lazy(() => import('./components/admin/AdminLayout'))
 const AdminLoginPage = lazy(() => import('./pages/admin/AdminLoginPage'))
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
 const AdminSettingsPage = lazy(() => import('./pages/admin/AdminSettingsPage'))
@@ -40,7 +41,15 @@ const AdminMessagesPage = lazy(() => import('./pages/admin/AdminMessagesPage'))
 const AdminEmailSettingsPage = lazy(() => import('./pages/admin/AdminEmailSettingsPage'))
 
 function Page({ children }: { children: React.ReactNode }) {
-  return <Suspense fallback={<PageLoader />}>{children}</Suspense>
+  return <Suspense fallback={<PageLoader minHeight="min-h-[50vh]" />}>{children}</Suspense>
+}
+
+function AdminShell({ children }: { children: React.ReactNode }) {
+  return (
+    <Suspense fallback={<PageLoader minHeight="min-h-screen" label="Ładowanie panelu…" />}>
+      {children}
+    </Suspense>
+  )
 }
 
 export default function App() {
@@ -54,8 +63,21 @@ export default function App() {
           </Page>
         }
       />
-      <Route element={<AdminProtectedRoute />}>
-        <Route path="/admin" element={<AdminLayout />}>
+      <Route
+        element={
+          <AdminShell>
+            <AdminProtectedRoute />
+          </AdminShell>
+        }
+      >
+        <Route
+          path="/admin"
+          element={
+            <AdminShell>
+              <AdminLayout />
+            </AdminShell>
+          }
+        >
           <Route index element={<Page><AdminDashboard /></Page>} />
           <Route path="settings" element={<Page><AdminSettingsPage /></Page>} />
           <Route path="menu" element={<Page><AdminMenuPage /></Page>} />

@@ -7,10 +7,12 @@ export default defineConfig({
   build: {
     target: 'es2020',
     cssCodeSplit: true,
-    sourcemap: 'hidden',
+    sourcemap: false,
     rollupOptions: {
       output: {
         manualChunks(id) {
+          if (id.includes('node_modules/firebase/analytics')) return 'firebase-analytics'
+          if (id.includes('node_modules/firebase/storage')) return 'firebase-storage'
           if (id.includes('node_modules/firebase/auth')) return 'firebase-auth'
           if (id.includes('node_modules/firebase/firestore')) return 'firebase-firestore'
           if (id.includes('node_modules/firebase')) return 'firebase-core'
