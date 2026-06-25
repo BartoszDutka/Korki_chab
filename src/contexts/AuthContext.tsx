@@ -8,6 +8,7 @@ interface AuthContextValue {
   user: User | null
   profile: UserProfile | null
   loading: boolean
+  authChecked: boolean
   login: (email: string, password: string) => Promise<void>
   register: (email: string, password: string, displayName?: string) => Promise<void>
   signInWithGoogle: () => Promise<void>
@@ -21,7 +22,7 @@ const AuthContext = createContext<AuthContextValue | null>(null)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<UserProfile | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [authChecked, setAuthChecked] = useState(false)
 
   useEffect(() => {
     let unsub: (() => void) | undefined
@@ -44,14 +45,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } else {
           setProfile(null)
         }
-        setLoading(false)
+        setAuthChecked(true)
       })
     }
 
     if ('requestIdleCallback' in window) {
-      window.requestIdleCallback(() => void start(), { timeout: 2500 })
+      window.requestIdleCallback(() => void start(), { timeout: 3000 })
     } else {
-      globalThis.setTimeout(() => void start(), 300)
+      globalThis.setTimeout(() => void start(), 500)
     }
 
     return () => {
@@ -101,12 +102,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const isAdmin = profile?.role === 'admin' || isAdminEmail(user?.email)
   const isUser = !!user && profile?.role === 'user'
+  const loading = !authChecked
 
   const value = useMemo(
     () => ({
       user,
       profile,
       loading,
+      authChecked,
       login,
       register,
       signInWithGoogle,
@@ -114,7 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isAdmin,
       isUser,
     }),
-    [user, profile, loading, login, register, signInWithGoogle, logout, isAdmin, isUser],
+    [user, profile, loading, authChecked, login, register, signInWithGoogle, logout, isAdmin, isUser],
   )
 
   return (

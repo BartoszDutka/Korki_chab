@@ -57,7 +57,7 @@ function NavItem({
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const { user, isAdmin, logout, signInWithGoogle, loading: authLoading } = useAuth()
+  const { user, isAdmin, logout, signInWithGoogle, authChecked } = useAuth()
   const { count } = useCart()
   const fetchSettings = useCallback(
     () => import('../services/settingsService').then((m) => m.settingsService.get()),
@@ -67,8 +67,8 @@ export default function Header() {
     () => import('../services/menuService').then((m) => m.menuService.getAll()),
     [],
   )
-  const { data: settingsDeferred } = useDeferredOnce(fetchSettings)
-  const { data: menuDeferred, settled: menuSettled } = useDeferredOnce(fetchMenu)
+  const { data: settingsDeferred } = useDeferredOnce(fetchSettings, { delayMs: 2000 })
+  const { data: menuDeferred, settled: menuSettled } = useDeferredOnce(fetchMenu, { delayMs: 2000 })
   const menuItems = useMemo(() => {
     const items = menuDeferred ?? []
     const sorted = items.length === 0 ? DEFAULT_MENU : [...items].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
@@ -84,6 +84,8 @@ export default function Header() {
 
   const siteName = settingsDeferred?.siteName ?? DEFAULT_SITE_SETTINGS.siteName
   const closeMenu = () => setMenuOpen(false)
+  const showGuestAuth = !authChecked || (!user && !isAdmin)
+  const showUserAuth = authChecked && user && !isAdmin
 
   const handleGoogleLogin = async () => {
     try {
@@ -95,7 +97,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="bg-surface-container-lowest sticky top-0 w-full z-50 border-b border-outline-variant shadow-sm overflow-hidden">
+      <header className="bg-surface-container-lowest sticky top-0 w-full z-50 border-b border-outline-variant shadow-sm overflow-hidden h-16 lg:h-20">
         <div className="flex items-center gap-2 sm:gap-3 h-16 lg:h-20 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full min-w-0">
           <Link
             to="/"
@@ -114,14 +116,12 @@ export default function Header() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0 ml-auto min-h-[44px] min-w-[44px] lg:min-w-[240px] justify-end">
-            {authLoading ? (
-              <div className="hidden lg:flex gap-2 w-[240px] h-[44px]" aria-hidden="true" />
-            ) : user && !isAdmin ? (
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0 ml-auto min-h-[44px] min-w-[44px] lg:min-w-[280px] justify-end">
+            {showUserAuth ? (
               <>
                 <Link
                   to="/koszyk"
-                  className="hidden lg:inline-flex items-center gap-1 font-medium text-label-sm xl:text-label-md px-2 xl:px-3 py-2 rounded-lg text-primary hover:bg-surface-container-low whitespace-nowrap"
+                  className="hidden lg:inline-flex items-center gap-1 font-medium text-label-sm xl:text-label-md px-2 xl:px-3 py-2 rounded-lg text-primary hover:bg-surface-container-low whitespace-nowrap min-h-[44px]"
                 >
                   Koszyk
                   <span
@@ -135,19 +135,19 @@ export default function Header() {
                 </Link>
                 <Link
                   to="/moje-zajecia"
-                  className="hidden xl:inline-flex font-medium text-label-md px-3 py-2 rounded-lg text-primary hover:bg-surface-container-low whitespace-nowrap"
+                  className="hidden xl:inline-flex font-medium text-label-md px-3 py-2 rounded-lg text-primary hover:bg-surface-container-low whitespace-nowrap min-h-[44px] items-center"
                 >
                   Moje zajęcia
                 </Link>
                 <button
                   type="button"
                   onClick={() => logout()}
-                  className="hidden xl:inline-flex font-medium text-label-md px-3 py-2 rounded-lg text-primary hover:bg-surface-container-low whitespace-nowrap"
+                  className="hidden xl:inline-flex font-medium text-label-md px-3 py-2 rounded-lg text-primary hover:bg-surface-container-low whitespace-nowrap min-h-[44px] items-center"
                 >
                   Wyloguj
                 </button>
               </>
-            ) : !user ? (
+            ) : showGuestAuth ? (
               <>
                 <Link
                   to="/zaloguj"
@@ -157,7 +157,7 @@ export default function Header() {
                 </Link>
                 <Link
                   to="/zaloguj?mode=register"
-                  className="hidden lg:inline-flex bg-secondary-container text-on-secondary font-medium text-label-sm xl:text-label-md px-3 xl:px-4 py-2 rounded-lg hover:bg-warm-orange-hover transition-colors font-bold shadow-sm min-h-[44px] items-center whitespace-nowrap"
+                  className="hidden lg:inline-flex bg-secondary-container text-on-secondary font-medium text-label-sm xl:text-label-md px-3 xl:px-4 py-2 rounded-lg hover:bg-warm-orange-hover transition-[background-color,transform] font-bold shadow-sm min-h-[44px] items-center whitespace-nowrap"
                 >
                   Zarejestruj się
                 </Link>

@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Manrope Variable", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-sans: "Manrope Variable", "Manrope Fallback", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
   --color-warm-orange-hover: #e68a00;
   --color-surface-container-lowest: #ffffff;
@@ -56,6 +56,15 @@
 }
 
 @layer base {
+  @font-face {
+    font-family: "Manrope Fallback";
+    src: local("Segoe UI"), local("Arial");
+    size-adjust: 97%;
+    ascent-override: 95%;
+    descent-override: 22%;
+    line-gap-override: 0%;
+  }
+
   html {
     scroll-behavior: smooth;
     overflow-x: hidden;
@@ -86,7 +95,7 @@
 
 @layer utilities {
   .card-hover {
-    @apply transition-[transform,box-shadow] duration-300;
+    @apply transition-[transform,box-shadow] duration-300 border border-transparent;
   }
 
   .card-hover:hover {

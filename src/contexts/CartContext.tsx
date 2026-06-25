@@ -17,13 +17,14 @@ interface CartContextValue {
 const CartContext = createContext<CartContextValue | null>(null)
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth()
+  const { user, authChecked } = useAuth()
   const [items, setItems] = useState<CartItem[]>([])
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (!user) {
+    if (!authChecked || !user) {
       setItems([])
+      setLoading(false)
       return
     }
     setLoading(true)
@@ -35,7 +36,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       })
     })
     return () => unsub?.()
-  }, [user])
+  }, [user, authChecked])
 
   const persist = useCallback(
     async (newItems: CartItem[]) => {

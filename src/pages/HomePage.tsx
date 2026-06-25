@@ -9,7 +9,7 @@ import { SITE_URL } from '../lib/seo'
 import { DEFAULT_SITE_SETTINGS } from '../data/defaults'
 import { IMAGES, SUBJECTS } from '../data/content'
 import DataSetupBanner from '../components/DataSetupBanner'
-import { CardSkeleton, GridSkeleton, PostCardSkeleton } from '../components/skeletons'
+import { GridSkeleton, PostCardSkeleton } from '../components/skeletons'
 import type { Subject } from '../types'
 
 const PLACEHOLDER_SUBJECTS: Subject[] = SUBJECTS.map((s, order) => ({
@@ -39,10 +39,10 @@ export default function HomePage() {
     [],
   )
 
-  const { data: settingsRaw, settled: settingsSettled } = useDeferredOnce(fetchSettings)
-  const { data: seoRaw } = useDeferredOnce(fetchSeo)
-  const { data: postsRaw, settled: postsSettled } = useDeferredOnce(fetchPosts)
-  const { data: subjectsRaw, settled: subjectsSettled } = useDeferredOnce(fetchSubjects)
+  const { data: settingsRaw, settled: settingsSettled } = useDeferredOnce(fetchSettings, { delayMs: 1500 })
+  const { data: seoRaw } = useDeferredOnce(fetchSeo, { delayMs: 3500 })
+  const { data: postsRaw, settled: postsSettled } = useDeferredOnce(fetchPosts, { delayMs: 3000 })
+  const { data: subjectsRaw } = useDeferredOnce(fetchSubjects, { delayMs: 2500 })
 
   const settings = settingsRaw ?? DEFAULT_SITE_SETTINGS
   const seo = seoRaw
@@ -167,20 +167,14 @@ export default function HomePage() {
                 Zobacz wszystkie <Icon name="arrow_forward" className="text-sm" />
               </Link>
             </div>
-            {!subjectsSettled ? (
-              <GridSkeleton count={6}>
-                <CardSkeleton />
-              </GridSkeleton>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {subjects.slice(0, 6).map((s) => (
-                  <div key={s.id} className="bg-white border border-outline-variant/30 rounded-xl p-6 card-hover min-h-[140px]">
-                    <h3 className="font-bold text-primary mb-2">{s.name}</h3>
-                    <p className="text-body-md text-on-surface-variant text-sm">{s.description}</p>
-                  </div>
-                ))}
-              </div>
-            )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 min-h-[300px]">
+              {subjects.slice(0, 6).map((s) => (
+                <div key={s.id} className="bg-white border border-outline-variant/30 rounded-xl p-6 card-hover min-h-[140px]">
+                  <h3 className="font-bold text-primary mb-2 leading-7 min-h-[1.75rem]">{s.name}</h3>
+                  <p className="text-body-md text-on-surface-variant text-sm leading-6 line-clamp-3 min-h-[4.5rem]">{s.description}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
       )}
@@ -206,7 +200,9 @@ export default function HomePage() {
                   </Link>
                 ))}
               </div>
-            ) : null}
+            ) : (
+              <div className="min-h-[180px]" aria-hidden="true" />
+            )}
           </div>
         </section>
       )}
