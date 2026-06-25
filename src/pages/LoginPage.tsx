@@ -7,6 +7,11 @@ import { inputClass } from '../components/admin/AdminUi'
 
 type Mode = 'login' | 'register'
 
+function getSafeRedirectPath(raw: string | null): string {
+  if (!raw || !raw.startsWith('/') || raw.startsWith('//')) return '/moje-zajecia'
+  return raw
+}
+
 function authErrorMessage(code: string): string {
   switch (code) {
     case 'auth/email-already-in-use':
@@ -23,6 +28,23 @@ function authErrorMessage(code: string): string {
       return 'Zbyt wiele prób. Spróbuj ponownie za chwilę.'
     default:
       return 'Operacja nie powiodła się. Spróbuj ponownie.'
+  }
+}
+
+function googleErrorMessage(code: string): string {
+  switch (code) {
+    case 'auth/unauthorized-domain':
+      return 'Ta domena nie jest autoryzowana w Firebase. Dodaj korepetycjechabowka.netlify.app w Authentication → Settings → Authorized domains.'
+    case 'auth/popup-blocked':
+      return 'Przeglądarka zablokowała popup. Zezwól na wyskakujące okienka dla tej strony.'
+    case 'auth/popup-closed-by-user':
+      return 'Logowanie anulowane — okno Google zostało zamknięte.'
+    case 'auth/cancelled-popup-request':
+      return 'Logowanie anulowane. Spróbuj ponownie.'
+    case 'auth/operation-not-allowed':
+      return 'Logowanie przez Google nie jest włączone w Firebase Console (Authentication → Sign-in method).'
+    default:
+      return authErrorMessage(code) || 'Logowanie przez Google nie powiodło się.'
   }
 }
 
@@ -50,8 +72,10 @@ export default function LoginPage() {
   })
 
   if (!loading && user && !isAdmin) {
-    return <Navigate to="/moje-zajecia" replace />
+    return <Navigate to={getSafeRedirectPath(searchParams.get('redirect'))} replace />
   }
+
+  const afterAuthPath = () => getSafeRedirectPath(searchParams.get('redirect'))
 
   const handleEmailSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -63,7 +87,7 @@ export default function LoginPage() {
       } else {
         await register(email, password, displayName)
       }
-      navigate('/moje-zajecia')
+      navigate(afterAuthPath())
     } catch (err) {
       const code = (err as { code?: string }).code ?? ''
       setError(authErrorMessage(code))
@@ -77,9 +101,10 @@ export default function LoginPage() {
     setError('')
     try {
       await signInWithGoogle()
-      navigate('/moje-zajecia')
-    } catch {
-      setError('Logowanie przez Google nie powiodło się.')
+      navigate(afterAuthPath())
+    } catch (err) {
+      const code = (err as { code?: string }).code ?? ''
+      setError(googleErrorMessage(code))
     } finally {
       setSubmitting(false)
     }
