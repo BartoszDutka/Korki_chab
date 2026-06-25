@@ -1,0 +1,118 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.email == 'admin@centrumchabowka.pl' ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+      );
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    match /siteSettings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /menuItems/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /subjects/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /educationLevels/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /posts/{docId} {
+      allow read: if resource.data.status == 'published' || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /pricingItems/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /testimonials/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /faqItems/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /contactSettings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /formSettings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /footerSettings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /seoSettings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /emailSettings/{docId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /courses/{docId} {
+      allow read: if isAdmin() ||
+        (resource.data.visible == true && resource.data.status in ['active', 'full']);
+      allow write: if isAdmin();
+    }
+
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid);
+      allow update: if isOwner(uid) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /carts/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    match /enrollments/{docId} {
+      allow read: if isAdmin() ||
+        (isAuthenticated() && resource.data.userId == request.auth.uid);
+      allow create: if
+        request.resource.data.status == 'sent' &&
+        (request.auth == null && request.resource.data.isGuest == true ||
+         isAuthenticated() && request.resource.data.userId == request.auth.uid);
+      allow update, delete: if isAdmin();
+    }
+
+    match /messages/{docId} {
+      allow read: if isAdmin();
+      allow create: if true;
+      allow update, delete: if isAdmin();
+    }
+  }
+}

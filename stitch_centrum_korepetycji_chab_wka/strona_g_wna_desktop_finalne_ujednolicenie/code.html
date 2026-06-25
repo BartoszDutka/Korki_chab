@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+<html lang="pl"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Centrum Korepetycji Chabówka</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "warm-orange-hover": "#E68A00",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#001b3c",
+                        "on-error": "#ffffff",
+                        "primary-fixed-dim": "#a7c8ff",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed": "#341100",
+                        "on-background": "#0b1c30",
+                        "surface-tint": "#3a5f94",
+                        "secondary-fixed": "#ffdcbd",
+                        "on-secondary-container": "#643900",
+                        "tertiary-container": "#592300",
+                        "primary-fixed": "#d5e3ff",
+                        "on-primary-fixed-variant": "#1f477b",
+                        "surface-variant": "#d3e4fe",
+                        "secondary": "#8a5100",
+                        "inverse-on-surface": "#eaf1ff",
+                        "tertiary": "#381300",
+                        "on-secondary-fixed-variant": "#693c00",
+                        "tertiary-fixed-dim": "#ffb690",
+                        "on-tertiary-container": "#d8885c",
+                        "academic-navy-deep": "#002244",
+                        "inverse-surface": "#213145",
+                        "on-primary-container": "#799dd6",
+                        "inverse-primary": "#a7c8ff",
+                        "error": "#ba1a1a",
+                        "on-tertiary": "#ffffff",
+                        "primary": "#001e40",
+                        "text-main": "#1A1A1A",
+                        "secondary-container": "#f39200",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed": "#2c1600",
+                        "on-tertiary-fixed-variant": "#723610",
+                        "surface-bright": "#f8f9ff",
+                        "surface-dim": "#cbdbf5",
+                        "on-surface": "#0b1c30",
+                        "background": "#f8f9ff",
+                        "outline": "#737780",
+                        "surface-subtle": "#F8F8F8",
+                        "on-surface-variant": "#43474f",
+                        "surface-container-highest": "#d3e4fe",
+                        "surface-container-low": "#eff4ff",
+                        "on-primary": "#ffffff",
+                        "surface": "#f8f9ff",
+                        "tertiary-fixed": "#ffdbca",
+                        "surface-container": "#e5eeff",
+                        "secondary-fixed-dim": "#ffb86f",
+                        "outline-variant": "#c3c6d1",
+                        "surface-container-high": "#dce9ff",
+                        "on-secondary": "#ffffff",
+                        "primary-container": "#003366"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "8px",
+                        "section-gap": "100px",
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "40px",
+                        "container-max": "1200px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Manrope"],
+                        "display-lg": ["Manrope"],
+                        "headline-md": ["Manrope"],
+                        "headline-lg": ["Manrope"],
+                        "label-md": ["Manrope"],
+                        "headline-lg-mobile": ["Manrope"],
+                        "display-lg-mobile": ["Manrope"],
+                        "body-md": ["Manrope"],
+                        "body-lg": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "800" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .card-hover:hover {
+            box-shadow: 0 12px 30px -10px rgba(0, 30, 64, 0.1);
+            transform: translateY(-4px);
+        }
+    </style>
+</head>
+<body class="bg-surface-container-lowest text-on-background font-body-md antialiased">
+<!-- Header from Shared Components -->
+<header class="bg-surface-container-lowest dark:bg-on-primary sticky top-0 w-full z-50 border-b border-outline-variant dark:border-on-surface-variant shadow-sm">
+<div class="flex justify-between items-center h-20 px-margin-desktop max-w-container-max mx-auto w-full">
+<div class="text-headline-md font-headline-md font-extrabold text-academic-navy-deep">
+            Centrum Chabówka
+        </div>
+<nav class="hidden md:flex gap-gutter">
+<a class="text-primary dark:text-primary-fixed hover:text-secondary-container transition-colors font-label-md text-label-md hover:bg-surface-container-low dark:hover:bg-primary-container transition-all active:scale-95 duration-150 px-3 py-2 rounded-lg" href="#">Przedmioty</a>
+<a class="text-primary dark:text-primary-fixed hover:text-secondary-container transition-colors font-label-md text-label-md hover:bg-surface-container-low dark:hover:bg-primary-container transition-all active:scale-95 duration-150 px-3 py-2 rounded-lg" href="#">O nas</a>
+<a class="text-primary dark:text-primary-fixed hover:text-secondary-container transition-colors font-label-md text-label-md hover:bg-surface-container-low dark:hover:bg-primary-container transition-all active:scale-95 duration-150 px-3 py-2 rounded-lg" href="#">Cennik</a>
+<a class="text-primary dark:text-primary-fixed hover:text-secondary-container transition-colors font-label-md text-label-md hover:bg-surface-container-low dark:hover:bg-primary-container transition-all active:scale-95 duration-150 px-3 py-2 rounded-lg" href="#">Kontakt</a>
+</nav>
+<button class="bg-secondary-container text-on-secondary font-label-md text-label-md px-6 py-3 rounded-lg hover:bg-warm-orange-hover transition-colors font-bold shadow-sm active:scale-95 duration-150">
+            Zapisz się
+        </button>
+</div>
+</header>
+<main>
+<!-- Hero Section -->
+<section class="py-section-gap px-margin-mobile md:px-margin-desktop bg-surface-container-lowest">
+<div class="max-w-container-max mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+<div class="flex flex-col items-start space-y-8">
+<h1 class="text-display-lg-mobile md:text-display-lg font-display-lg text-primary">
+                    Rozwiń swój potencjał z nami
+                </h1>
+<p class="text-body-lg text-on-surface-variant max-w-lg">
+                    Profesjonalne korepetycje w przyjaznej atmosferze. Dołącz do grona zadowolonych uczniów i osiągaj lepsze wyniki w nauce z najlepszymi nauczycielami w Chabówce.
+                </p>
+<div class="flex flex-col sm:flex-row gap-4">
+<button class="bg-secondary-container hover:bg-warm-orange-hover text-on-secondary px-10 py-5 rounded-lg font-label-md text-label-md font-bold shadow-sm transition-all active:scale-95">
+                        Zapisz się na zajęcia
+                    </button>
+<button class="border-2 border-primary text-primary hover:bg-surface-container-low px-10 py-5 rounded-lg font-label-md text-label-md font-bold transition-all active:scale-95">
+                        Poznaj ofertę
+                    </button>
+</div>
+</div>
+<div class="relative h-[450px] lg:h-[550px] w-full rounded-2xl overflow-hidden shadow-sm bg-academic-navy-deep">
+<img class="object-cover w-full h-full absolute inset-0 opacity-90" data-alt="Educational visual" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJjwIqDmAGDJxF3UkJNKnzrdbRfYEIDjVW8nFpgrtmW2GJfHIumc1lHZI_kWVa_Ap5i7siDy4b9Qkua_-jWBSHKXzuLKl9h_VqjfjMIIMzdsg1iPE3zgmaO_PblQuxUyCfnEjOxHkMjnlDiwcbhhGN0As8hnUCMExDkoKxvN4lbSyuVXjC-C-zXzrprKR6QKIwvTHSYjYwujxroOkYgoY7d7QNz5MO0_qBnDKKOWMlbY5LZeNv_FTMBh3wdB_h7O--1mCwFIzFXoA"/>
+</div>
+</div>
+</section>
+<!-- Key Features Section -->
+<section class="py-section-gap px-margin-mobile md:px-margin-desktop bg-surface-bright">
+<div class="max-w-container-max mx-auto">
+<div class="text-center mb-16">
+<h2 class="text-headline-lg font-headline-lg text-primary mb-4">Dlaczego my?</h2>
+<p class="text-body-lg text-on-surface-variant max-w-2xl mx-auto">Tworzymy środowisko, w którym nauka staje się przyjemnością, a trudne tematy stają się zrozumiałe.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Feature 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-10 flex flex-col items-center text-center card-hover transition-all duration-300">
+<div class="w-20 h-20 rounded-full bg-surface-container-high flex items-center justify-center mb-8 text-primary">
+<span class="material-symbols-outlined text-5xl" style="font-variation-settings: 'FILL' 1;">person_play</span>
+</div>
+<h3 class="text-headline-md font-headline-md text-primary mb-4">Indywidualne podejście</h3>
+<p class="text-body-md text-on-surface-variant">Dostosowujemy tempo i metody nauczania do potrzeb każdego ucznia, zapewniając maksymalną efektywność zajęć.</p>
+</div>
+<!-- Feature 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-10 flex flex-col items-center text-center card-hover transition-all duration-300">
+<div class="w-20 h-20 rounded-full bg-surface-container-high flex items-center justify-center mb-8 text-primary">
+<span class="material-symbols-outlined text-5xl" style="font-variation-settings: 'FILL' 1;">local_library</span>
+</div>
+<h3 class="text-headline-md font-headline-md text-primary mb-4">Lokalni nauczyciele</h3>
+<p class="text-body-md text-on-surface-variant">Współpracujemy z doświadczonymi pedagogami z regionu, którzy znają lokalne środowisko edukacyjne i wymagania szkół.</p>
+</div>
+<!-- Feature 3 -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-10 flex flex-col items-center text-center card-hover transition-all duration-300">
+<div class="w-20 h-20 rounded-full bg-surface-container-high flex items-center justify-center mb-8 text-primary">
+<span class="material-symbols-outlined text-5xl" style="font-variation-settings: 'FILL' 1;">laptop_chromebook</span>
+</div>
+<h3 class="text-headline-md font-headline-md text-primary mb-4">Nowoczesne sale</h3>
+<p class="text-body-md text-on-surface-variant">Nasze sale są w pełni wyposażone w nowoczesne pomoce dydaktyczne, tworząc idealne warunki do skupienia i nauki.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Subjects Grid -->
+<section class="py-section-gap px-margin-mobile md:px-margin-desktop bg-surface-container-lowest">
+<div class="max-w-container-max mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+<div>
+<h2 class="text-headline-lg font-headline-lg text-primary mb-3">Nasze Przedmioty</h2>
+<p class="text-body-lg text-on-surface-variant">Wybierz przedmiot, z którym potrzebujesz pomocy.</p>
+</div>
+<button class="text-primary font-label-md text-label-md hover:text-secondary-container transition-colors flex items-center gap-2 group">
+                    Zobacz wszystkie <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Subject Cards -->
+<div class="bg-surface-bright rounded-2xl p-8 border border-outline-variant/30 card-hover transition-all duration-300 cursor-pointer flex items-start gap-6">
+<div class="w-14 h-14 rounded-xl bg-surface-container-highest flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">calculate</span>
+</div>
+<div>
+<h4 class="text-body-lg font-bold text-primary mb-2">Matematyka</h4>
+<p class="text-body-md text-on-surface-variant text-sm">Szkoła podstawowa, liceum, matura.</p>
+</div>
+</div>
+<div class="bg-surface-bright rounded-2xl p-8 border border-outline-variant/30 card-hover transition-all duration-300 cursor-pointer flex items-start gap-6">
+<div class="w-14 h-14 rounded-xl bg-surface-container-highest flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">language</span>
+</div>
+<div>
+<h4 class="text-body-lg font-bold text-primary mb-2">Język Angielski</h4>
+<p class="text-body-md text-on-surface-variant text-sm">Konwersacje, gramatyka, certyfikaty.</p>
+</div>
+</div>
+<div class="bg-surface-bright rounded-2xl p-8 border border-outline-variant/30 card-hover transition-all duration-300 cursor-pointer flex items-start gap-6">
+<div class="w-14 h-14 rounded-xl bg-surface-container-highest flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">science</span>
+</div>
+<div>
+<h4 class="text-body-lg font-bold text-primary mb-2">Chemia</h4>
+<p class="text-body-md text-on-surface-variant text-sm">Zrozum reakcje i przygotuj się do egzaminów.</p>
+</div>
+</div>
+<div class="bg-surface-bright rounded-2xl p-8 border border-outline-variant/30 card-hover transition-all duration-300 cursor-pointer flex items-start gap-6">
+<div class="w-14 h-14 rounded-xl bg-surface-container-highest flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">function</span>
+</div>
+<div>
+<h4 class="text-body-lg font-bold text-primary mb-2">Fizyka</h4>
+<p class="text-body-md text-on-surface-variant text-sm">Zrozum otaczający Cię świat. Matura rozszerzona.</p>
+</div>
+</div>
+<div class="bg-surface-bright rounded-2xl p-8 border border-outline-variant/30 card-hover transition-all duration-300 cursor-pointer flex items-start gap-6">
+<div class="w-14 h-14 rounded-xl bg-surface-container-highest flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">menu_book</span>
+</div>
+<div>
+<h4 class="text-body-lg font-bold text-primary mb-2">Język Polski</h4>
+<p class="text-body-md text-on-surface-variant text-sm">Pisanie wypracowań, analiza lektur.</p>
+</div>
+</div>
+<div class="bg-surface-bright rounded-2xl p-8 border border-outline-variant/30 card-hover transition-all duration-300 cursor-pointer flex items-start gap-6">
+<div class="w-14 h-14 rounded-xl bg-surface-container-highest flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">biotech</span>
+</div>
+<div>
+<h4 class="text-body-lg font-bold text-primary mb-2">Biologia</h4>
+<p class="text-body-md text-on-surface-variant text-sm">Przygotowanie na studia medyczne i przyrodnicze.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- About Section (Galileusz Style) -->
+<section class="py-section-gap px-margin-mobile md:px-margin-desktop bg-surface-bright">
+<div class="max-w-container-max mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+<div class="lg:col-span-5 relative h-[550px] rounded-2xl overflow-hidden shadow-lg border-4 border-surface-container-lowest">
+<img class="object-cover w-full h-full absolute inset-0" data-alt="Teaching team" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhiQfpaQVSRL9DJPYiXr9LKiRKTrxUWq1_tW7S6bVroOfPwzWm4dniVFxM2aS0YE1rbodzw3-RZqzB5iNQSqHgqC7VJzVFIso083Rodh1SW5DEtryinAAuhdcWlQE2Ua72_f0vvJ37WCOEgC1a82yiEO6bSejMhevd9SDXebEtZKhWxl_Z17W7Xki6Ho9ji1ZNnV9uWwCH6mRCNYf9aQmxLiHsdZkqjzlelTwguZA0TuAvtGZzoMjOGP9Nq3hbvk2uvShye7g68rY"/>
+</div>
+<div class="lg:col-span-1"></div>
+<div class="lg:col-span-6 flex flex-col space-y-8">
+<h2 class="text-headline-lg font-headline-lg text-primary">
+                    Z pasji do nauczania w sercu Chabówki
+                </h2>
+<div class="space-y-6">
+<p class="text-body-lg text-on-surface-variant">
+                        Nasze centrum powstało z myślą o lokalnej społeczności. Chcemy zapewnić uczniom z naszej okolicy dostęp do najwyższej jakości edukacji bez konieczności dalekich dojazdów. 
+                    </p>
+<p class="text-body-md text-on-surface-variant">
+                        Wierzymy, że każdy uczeń ma potencjał, a kluczem do sukcesu jest odpowiednie środowisko i wsparcie zaangażowanego nauczyciela. Nasz zespół tworzą pasjonaci, dla których Twoje postępy są największą nagrodą.
+                    </p>
+</div>
+<div class="pt-4">
+<button class="border-2 border-outline text-primary hover:bg-surface-container-low px-8 py-3 rounded-lg font-label-md text-label-md font-bold transition-all active:scale-95">
+                        Więcej o zespole
+                    </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Contact Banner -->
+<section class="py-section-gap px-margin-mobile md:px-margin-desktop bg-academic-navy-deep relative overflow-hidden">
+<!-- Decoration -->
+<div class="absolute top-0 right-0 w-64 h-64 bg-secondary-container/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+<div class="absolute bottom-0 left-0 w-64 h-64 bg-primary/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+<div class="max-w-container-max mx-auto relative z-10 flex flex-col md:flex-row items-center justify-between gap-12 bg-surface-container-lowest/5 backdrop-blur-md p-12 rounded-3xl border border-white/10">
+<div class="text-center md:text-left">
+<h2 class="text-headline-lg font-headline-lg text-surface-container-lowest mb-4">Gotowy na pierwsze zajęcia?</h2>
+<p class="text-body-lg text-surface-container-high/80 max-w-xl">Skontaktuj się z nami telefonicznie, odwiedź nas w placówce lub zostaw wiadomość. Znajdziemy idealnego korepetytora dla Ciebie.</p>
+</div>
+<div class="shrink-0">
+<button class="bg-secondary-container hover:bg-warm-orange-hover text-on-secondary px-10 py-5 rounded-xl font-label-md text-label-md font-bold shadow-lg transition-all active:scale-95 flex items-center justify-center gap-3">
+<span class="material-symbols-outlined">call</span> Zadzwoń teraz
+                </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer from Shared Components -->
+<footer class="bg-academic-navy-deep dark:bg-primary w-full py-section-gap">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter px-margin-desktop max-w-container-max mx-auto">
+<div class="flex flex-col space-y-6">
+<div class="text-headline-md font-headline-md text-surface-container-lowest font-extrabold">
+                Centrum Chabówka
+            </div>
+<p class="text-body-md text-surface-container-high opacity-80 max-w-xs">
+                Twoje lokalne centrum wsparcia edukacyjnego. Pomagamy rozwijać skrzydła.
+            </p>
+</div>
+<div class="flex flex-col space-y-4">
+<h4 class="text-body-lg font-bold text-surface-container-lowest mb-2">Nawigacja</h4>
+<nav class="flex flex-col space-y-3">
+<a class="text-surface-container-high hover:text-secondary-fixed transition-colors hover:underline font-body-md" href="#">Przedmioty</a>
+<a class="text-surface-container-high hover:text-secondary-fixed transition-colors hover:underline font-body-md" href="#">O nas</a>
+<a class="text-surface-container-high hover:text-secondary-fixed transition-colors hover:underline font-body-md" href="#">Cennik</a>
+<a class="text-surface-container-high hover:text-secondary-fixed transition-colors hover:underline font-body-md" href="#">Kontakt</a>
+</nav>
+</div>
+<div class="flex flex-col space-y-4">
+<h4 class="text-body-lg font-bold text-surface-container-lowest mb-2">Informacje prawne</h4>
+<nav class="flex flex-col space-y-3">
+<a class="text-surface-container-high hover:text-secondary-fixed transition-colors hover:underline font-body-md" href="#">Polityka Prywatności</a>
+<a class="text-surface-container-high hover:text-secondary-fixed transition-colors hover:underline font-body-md" href="#">Regulamin</a>
+</nav>
+</div>
+<div class="col-span-1 md:col-span-3 pt-12 mt-12 border-t border-surface-container-high/20 text-center">
+<p class="text-surface-container-high/60 text-sm">
+                © 2024 Centrum Korepetycji Chabówka. Wszelkie prawa zastrzeżone.
+            </p>
+</div>
+</div>
+</footer>
+</body></html>

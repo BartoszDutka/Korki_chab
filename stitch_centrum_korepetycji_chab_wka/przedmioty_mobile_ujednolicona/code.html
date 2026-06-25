@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+
+<html class="light" lang="pl"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Centrum Chabówka - Przedmioty</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "text-main": "#1A1A1A",
+                    "on-tertiary-fixed-variant": "#723610",
+                    "surface-bright": "#f8f9ff",
+                    "on-tertiary": "#ffffff",
+                    "inverse-on-surface": "#eaf1ff",
+                    "on-tertiary-fixed": "#341100",
+                    "on-background": "#0b1c30",
+                    "error": "#ba1a1a",
+                    "on-tertiary-container": "#d8885c",
+                    "on-error-container": "#93000a",
+                    "tertiary": "#381300",
+                    "surface-subtle": "#F8F8F8",
+                    "tertiary-fixed": "#ffdbca",
+                    "tertiary-fixed-dim": "#ffb690",
+                    "on-error": "#ffffff",
+                    "on-primary-container": "#799dd6",
+                    "outline": "#737780",
+                    "on-surface": "#0b1c30",
+                    "on-secondary-fixed": "#2c1600",
+                    "on-secondary-container": "#643900",
+                    "error-container": "#ffdad6",
+                    "on-secondary-fixed-variant": "#693c00",
+                    "background": "#f8f9ff",
+                    "on-primary-fixed": "#001b3c",
+                    "on-surface-variant": "#43474f",
+                    "surface-variant": "#d3e4fe",
+                    "on-primary": "#ffffff",
+                    "primary-fixed-dim": "#a7c8ff",
+                    "surface-container-low": "#eff4ff",
+                    "surface-container-high": "#dce9ff",
+                    "on-secondary": "#ffffff",
+                    "primary": "#001e40",
+                    "surface-container": "#e5eeff",
+                    "secondary-fixed": "#ffdcbd",
+                    "outline-variant": "#c3c6d1",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-fixed-dim": "#ffb86f",
+                    "secondary-container": "#fe9800",
+                    "primary-container": "#003366",
+                    "inverse-surface": "#213145",
+                    "tertiary-container": "#592300",
+                    "secondary": "#8a5100",
+                    "warm-orange-hover": "#E68A00",
+                    "surface-dim": "#cbdbf5",
+                    "inverse-primary": "#a7c8ff",
+                    "surface": "#f8f9ff",
+                    "academic-navy-deep": "#002244",
+                    "surface-container-highest": "#d3e4fe",
+                    "on-primary-fixed-variant": "#1f477b",
+                    "surface-tint": "#3a5f94",
+                    "primary-fixed": "#d5e3ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "40px",
+                    "section-gap": "80px",
+                    "margin-mobile": "16px",
+                    "gutter": "24px",
+                    "unit": "8px",
+                    "container-max": "1200px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Manrope"],
+                    "headline-md": ["Manrope"],
+                    "headline-lg-mobile": ["Manrope"],
+                    "body-lg": ["Manrope"],
+                    "display-lg-mobile": ["Manrope"],
+                    "body-md": ["Manrope"],
+                    "label-md": ["Manrope"],
+                    "display-lg": ["Manrope"],
+                    "headline-lg": ["Manrope"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "800"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #f8f9ff;
+            color: #1A1A1A;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 51, 102, 0.05), 0 2px 4px -1px rgba(0, 51, 102, 0.03);
+        }
+        .active-nav-indicator {
+            position: relative;
+        }
+        .active-nav-indicator::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background-color: currentColor;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface-container-lowest dark:bg-surface-container-lowest shadow-sm border-b border-outline-variant dark:border-outline flex justify-between items-center px-margin-mobile h-16 w-full">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed">menu</span>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-academic-navy-deep dark:text-primary-fixed-dim">Centrum Chabówka</h1>
+</div>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed text-2xl">account_circle</span>
+</div>
+</header>
+<main class="pt-24 pb-32 px-margin-mobile max-w-md mx-auto">
+<!-- Hero Section / Headline -->
+<section class="mb-8">
+<h2 class="font-display-lg-mobile text-display-lg-mobile text-academic-navy-deep mb-2">Nasza Oferta</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Profesjonalne korepetycje dostosowane do potrzeb Twojego dziecka. Wybierz przedmiot i zacznij naukę z pasją.</p>
+</section>
+<!-- Subjects Grid (Bento-style list for mobile) -->
+<section class="bento-grid mb-12">
+<!-- Matematyka -->
+<div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-xl card-shadow flex flex-col gap-4">
+<div class="w-12 h-12 bg-surface-container flex items-center justify-center rounded-lg">
+<span class="material-symbols-outlined text-primary text-3xl">functions</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-academic-navy-deep">Matematyka</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Od podstawówki po maturę rozszerzoną. Logiczne myślenie bez tajemnic.</p>
+</div>
+<button class="mt-2 w-full py-3 bg-academic-navy-deep text-on-primary font-label-md text-label-md rounded-lg active:scale-95 transition-transform">Dowiedz się więcej</button>
+</div>
+<!-- Angielski -->
+<div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-xl card-shadow flex flex-col gap-4">
+<div class="w-12 h-12 bg-surface-container flex items-center justify-center rounded-lg">
+<span class="material-symbols-outlined text-primary text-3xl">language</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-academic-navy-deep">Angielski</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Przełamywanie barier językowych, certyfikaty i swobodna komunikacja.</p>
+</div>
+<button class="mt-2 w-full py-3 bg-academic-navy-deep text-on-primary font-label-md text-label-md rounded-lg active:scale-95 transition-transform">Dowiedz się więcej</button>
+</div>
+<!-- Polski -->
+<div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-xl card-shadow flex flex-col gap-4">
+<div class="w-12 h-12 bg-surface-container flex items-center justify-center rounded-lg">
+<span class="material-symbols-outlined text-primary text-3xl">menu_book</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-academic-navy-deep">Polski</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Analiza lektur, pisanie wypracowań i przygotowanie do egzaminu ósmoklasisty.</p>
+</div>
+<button class="mt-2 w-full py-3 bg-academic-navy-deep text-on-primary font-label-md text-label-md rounded-lg active:scale-95 transition-transform">Dowiedz się więcej</button>
+</div>
+<!-- Fizyka -->
+<div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-xl card-shadow flex flex-col gap-4">
+<div class="w-12 h-12 bg-surface-container flex items-center justify-center rounded-lg">
+<span class="material-symbols-outlined text-primary text-3xl">precision_manufacturing</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-academic-navy-deep">Fizyka</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Zrozumienie praw rządzących światem poprzez praktyczne przykłady.</p>
+</div>
+<button class="mt-2 w-full py-3 bg-academic-navy-deep text-on-primary font-label-md text-label-md rounded-lg active:scale-95 transition-transform">Dowiedz się więcej</button>
+</div>
+<!-- Chemia -->
+<div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-xl card-shadow flex flex-col gap-4">
+<div class="w-12 h-12 bg-surface-container flex items-center justify-center rounded-lg">
+<span class="material-symbols-outlined text-primary text-3xl">science</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-academic-navy-deep">Chemia</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Reakcje, wzory i obliczenia chemiczne podane w przystępny sposób.</p>
+</div>
+<button class="mt-2 w-full py-3 bg-academic-navy-deep text-on-primary font-label-md text-label-md rounded-lg active:scale-95 transition-transform">Dowiedz się więcej</button>
+</div>
+<!-- Biologia -->
+<div class="bg-surface-container-lowest border border-outline-variant p-6 rounded-xl card-shadow flex flex-col gap-4">
+<div class="w-12 h-12 bg-surface-container flex items-center justify-center rounded-lg">
+<span class="material-symbols-outlined text-primary text-3xl">eco</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-academic-navy-deep">Biologia</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">Fascynujący świat przyrody i anatomii człowieka bez nudnego wkuwania.</p>
+</div>
+<button class="mt-2 w-full py-3 bg-academic-navy-deep text-on-primary font-label-md text-label-md rounded-lg active:scale-95 transition-transform">Dowiedz się więcej</button>
+</div>
+</section>
+<!-- Exam Prep Section -->
+<section class="bg-secondary-container rounded-2xl p-8 mb-12 overflow-hidden relative">
+<div class="relative z-10">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-secondary-container mb-4">Przygotowanie do egzaminów</h2>
+<p class="font-body-md text-body-md text-on-secondary-container opacity-90 mb-6">Specjalistyczne kursy ósmoklasisty i maturalne. Skupiamy się na arkuszach, technikach egzaminacyjnych i redukcji stresu.</p>
+<div class="flex flex-col gap-3">
+<div class="flex items-center gap-3 bg-surface-container-lowest/30 p-3 rounded-lg">
+<span class="material-symbols-outlined text-on-secondary-container">check_circle</span>
+<span class="font-label-md text-label-md text-on-secondary-container">Arkusze z ubiegłych lat</span>
+</div>
+<div class="flex items-center gap-3 bg-surface-container-lowest/30 p-3 rounded-lg">
+<span class="material-symbols-outlined text-on-secondary-container">check_circle</span>
+<span class="font-label-md text-label-md text-on-secondary-container">Indywidualny plan powtórek</span>
+</div>
+</div>
+<button class="mt-8 w-full py-4 bg-academic-navy-deep text-white font-bold rounded-full shadow-lg active:scale-95 transition-transform">Zapisz się na kurs</button>
+</div>
+<!-- Decorative circle -->
+<div class="absolute -bottom-10 -right-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+</section>
+<!-- FAQ Light teaser -->
+<section class="text-center">
+<p class="font-label-md text-label-md text-secondary uppercase tracking-wider mb-2">Masz pytania?</p>
+<h3 class="font-headline-md text-headline-md text-academic-navy-deep mb-4">Nie wiesz co wybrać?</h3>
+<button class="font-label-md text-label-md text-primary border-b-2 border-primary pb-1 inline-flex items-center gap-2">
+                Skonsultuj się z nami <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full bg-academic-navy-deep dark:bg-primary-container text-on-primary dark:text-on-primary-container font-body-md text-body-md flex flex-col items-center text-center gap-6 py-10 px-margin-mobile mb-16">
+<div class="font-headline-md text-headline-md text-on-primary font-bold">Centrum Chabówka</div>
+<div class="flex flex-wrap justify-center gap-x-6 gap-y-4">
+<a class="text-on-primary dark:text-on-primary-container opacity-80 hover:text-secondary-container transition-colors" href="#">About Us</a>
+<a class="text-on-primary dark:text-on-primary-container opacity-80 hover:text-secondary-container transition-colors" href="#">Terms of Service</a>
+<a class="text-on-primary dark:text-on-primary-container opacity-80 hover:text-secondary-container transition-colors" href="#">Privacy Policy</a>
+<a class="text-on-primary dark:text-on-primary-container opacity-80 hover:text-secondary-container transition-colors" href="#">Contact Support</a>
+</div>
+<div class="opacity-60 text-sm mt-4">© 2024 Centrum Chabówka. All rights reserved.</div>
+</footer>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface-container-lowest dark:bg-surface-container-lowest border-t border-outline-variant dark:border-outline shadow-lg flex justify-around items-center h-16 px-2 pb-safe">
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-surface-container dark:hover:bg-surface-container-high active:scale-90 transition-transform">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary dark:text-secondary-container font-bold active-nav-indicator active:scale-90 transition-transform">
+<span class="material-symbols-outlined">event_note</span>
+<span class="font-label-sm text-label-sm">Lessons</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-surface-container dark:hover:bg-surface-container-high active:scale-90 transition-transform">
+<span class="material-symbols-outlined">chat</span>
+<span class="font-label-sm text-label-sm">Messages</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant hover:bg-surface-container dark:hover:bg-surface-container-high active:scale-90 transition-transform">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</button>
+</nav>
+<!-- FAB for quick contact -->
+<button class="fixed right-6 bottom-24 w-14 h-14 bg-secondary-container text-on-secondary-container rounded-full shadow-2xl flex items-center justify-center active:scale-90 transition-transform z-40">
+<span class="material-symbols-outlined text-3xl">add_comment</span>
+</button>
+<script>
+        // Micro-interactions for buttons
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('touchstart', function() {
+                this.classList.add('opacity-80');
+            });
+            button.addEventListener('touchend', function() {
+                this.classList.remove('opacity-80');
+            });
+        });
+    </script>
+</body></html>

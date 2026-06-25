@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin/
+Disallow: /koszyk
+Disallow: /moje-zajecia
+Disallow: /zaloguj
+
+Sitemap: https://korki-c0e8c.web.app/sitemap.xml

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+
+<html lang="pl"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Kontakt - Centrum Chabówka</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed": "#ffdcbd",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-primary-fixed-variant": "#1f477b",
+                        "inverse-primary": "#a7c8ff",
+                        "on-surface": "#0b1c30",
+                        "outline-variant": "#c3c6d1",
+                        "primary-container": "#003366",
+                        "error": "#ba1a1a",
+                        "tertiary-container": "#592300",
+                        "surface-container": "#e5eeff",
+                        "primary-fixed": "#d5e3ff",
+                        "on-secondary": "#ffffff",
+                        "warm-orange-hover": "#E68A00",
+                        "surface-container-low": "#eff4ff",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#f8f9ff",
+                        "tertiary": "#381300",
+                        "on-background": "#0b1c30",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-container": "#fe9800",
+                        "tertiary-fixed-dim": "#ffb690",
+                        "background": "#f8f9ff",
+                        "surface": "#f8f9ff",
+                        "error-container": "#ffdad6",
+                        "academic-navy-deep": "#002244",
+                        "on-secondary-fixed": "#2c1600",
+                        "on-secondary-fixed-variant": "#693c00",
+                        "surface-container-high": "#dce9ff",
+                        "inverse-surface": "#213145",
+                        "surface-dim": "#cbdbf5",
+                        "inverse-on-surface": "#eaf1ff",
+                        "primary-fixed-dim": "#a7c8ff",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#799dd6",
+                        "surface-tint": "#3a5f94",
+                        "on-tertiary-fixed": "#341100",
+                        "secondary": "#8a5100",
+                        "surface-subtle": "#F8F8F8",
+                        "primary": "#001e40",
+                        "secondary-fixed-dim": "#ffb86f",
+                        "on-surface-variant": "#43474f",
+                        "on-secondary-container": "#643900",
+                        "on-error-container": "#93000a",
+                        "text-main": "#1A1A1A",
+                        "on-primary-fixed": "#001b3c",
+                        "tertiary-fixed": "#ffdbca",
+                        "on-tertiary-container": "#d8885c",
+                        "outline": "#737780",
+                        "on-tertiary-fixed-variant": "#723610",
+                        "surface-variant": "#d3e4fe",
+                        "on-tertiary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "unit": "8px",
+                        "margin-desktop": "40px",
+                        "margin-mobile": "16px",
+                        "container-max": "1200px",
+                        "section-gap": "80px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Manrope"],
+                        "label-md": ["Manrope"],
+                        "headline-md": ["Manrope"],
+                        "display-lg-mobile": ["Manrope"],
+                        "label-sm": ["Manrope"],
+                        "display-lg": ["Manrope"],
+                        "headline-lg-mobile": ["Manrope"],
+                        "body-md": ["Manrope"],
+                        "headline-lg": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "display-lg-mobile": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "800"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .ambient-shadow { box-shadow: 0 10px 25px -5px rgba(0, 51, 102, 0.08); }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md antialiased selection:bg-secondary-container selection:text-on-secondary">
+<!-- TopNavBar (Shared Component) -->
+<nav class="bg-surface-container-lowest dark:bg-on-primary sticky top-0 w-full z-50 border-b border-outline-variant dark:border-on-surface-variant shadow-sm">
+<div class="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<div class="text-headline-md font-headline-md font-extrabold text-academic-navy-deep">
+                Centrum Chabówka
+            </div>
+<div class="hidden md:flex items-center space-x-gutter">
+<a class="text-primary dark:text-primary-fixed hover:text-secondary-container transition-colors font-label-md text-label-md hover:bg-surface-container-low dark:hover:bg-primary-container transition-all active:scale-95 duration-150 p-2 rounded" href="#">Przedmioty</a>
+<a class="text-primary dark:text-primary-fixed hover:text-secondary-container transition-colors font-label-md text-label-md hover:bg-surface-container-low dark:hover:bg-primary-container transition-all active:scale-95 duration-150 p-2 rounded" href="#">O nas</a>
+<a class="text-primary dark:text-primary-fixed hover:text-secondary-container transition-colors font-label-md text-label-md hover:bg-surface-container-low dark:hover:bg-primary-container transition-all active:scale-95 duration-150 p-2 rounded" href="#">Cennik</a>
+<a class="text-secondary-container font-bold border-b-2 border-secondary-container pb-1 font-label-md text-label-md hover:bg-surface-container-low dark:hover:bg-primary-container transition-all active:scale-95 duration-150 p-2 rounded" href="#">Kontakt</a>
+</div>
+<button class="bg-secondary-container text-on-secondary font-label-md text-label-md px-6 py-3 rounded-lg hover:bg-warm-orange-hover transition-colors active:scale-95 duration-150 shadow-sm hidden md:block">
+                Zapisz się
+            </button>
+<button class="md:hidden text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">menu</span>
+</button>
+</div>
+</nav>
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-section-gap">
+<!-- Header -->
+<div class="text-center mb-16">
+<h1 class="text-display-lg-mobile md:text-display-lg font-display-lg-mobile md:font-display-lg text-primary mb-4">Skontaktuj się z nami</h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant max-w-2xl mx-auto">Jesteśmy tu, aby pomóc Twojemu dziecku osiągnąć sukces. Napisz do nas, a my przygotujemy spersonalizowany plan nauki.</p>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Left Info Panel -->
+<div class="lg:col-span-5 flex flex-col gap-gutter">
+<!-- Contact Info Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 hover:ambient-shadow transition-all duration-300">
+<h3 class="text-headline-md font-headline-md text-primary mb-8">Dane kontaktowe</h3>
+<ul class="space-y-8">
+<li class="flex items-start gap-4">
+<div class="bg-surface-container-low w-12 h-12 rounded-full flex items-center justify-center text-primary flex-shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">location_on</span>
+</div>
+<div>
+<p class="text-label-md font-label-md text-on-surface-variant mb-1">Adres</p>
+<p class="text-body-md font-body-md text-on-surface">ul. Edukacyjna 12<br/>Chabówka</p>
+</div>
+</li>
+<li class="flex items-start gap-4">
+<div class="bg-surface-container-low w-12 h-12 rounded-full flex items-center justify-center text-primary flex-shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">phone</span>
+</div>
+<div>
+<p class="text-label-md font-label-md text-on-surface-variant mb-1">Telefon</p>
+<p class="text-body-md font-body-md text-on-surface font-bold">+48 123 456 789</p>
+</div>
+</li>
+<li class="flex items-start gap-4">
+<div class="bg-surface-container-low w-12 h-12 rounded-full flex items-center justify-center text-primary flex-shrink-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">mail</span>
+</div>
+<div>
+<p class="text-label-md font-label-md text-on-surface-variant mb-1">Email</p>
+<p class="text-body-md font-body-md text-on-surface">kontakt@centrumchabowka.pl</p>
+</div>
+</li>
+</ul>
+<div class="mt-10 pt-8 border-t border-outline-variant/30 flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary-container" style="font-variation-settings: 'FILL' 1;">timer</span>
+<span class="text-label-md font-label-md text-primary">Odpowiadamy w ciągu 24h</span>
+</div>
+</div>
+<!-- Map Placeholder Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden relative group h-full min-h-[300px]">
+<img alt="Mapa" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3p7qKuv_878s5pNZRlMegV0ZoIKGbye-ut-1MMFIdSul4eUPIp-eNhDJUHZvlPpsMpRz2cd0lRGGs90bzQnWG_9x30DgJEB-iTWnYCDN-yW8PEj7MgNB80gyN4oPgw7KDqZqczt4J2Nsi4v4K3mWUk_hVOiXpH9miXW1PRyn5O7mhPq5kjBqxxR3KGEGLm3L6wu1lzx9-N3ebUB8AZOJaizuCUFTqYUdFixmZtVX3867bNUx073TWFoxr92JQjO4VPW8teZhEIPM"/>
+<div class="absolute inset-0 bg-academic-navy-deep/5 pointer-events-none"></div>
+<div class="absolute bottom-4 left-4 right-4 md:right-auto bg-surface-container-lowest/95 backdrop-blur-sm px-6 py-3 rounded-lg border border-outline-variant shadow-lg flex items-center justify-between md:justify-start gap-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">directions</span>
+<span class="text-label-md font-label-md text-primary">Zobacz dojazd</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant md:hidden">open_in_new</span>
+</div>
+</div>
+</div>
+<!-- Right Form Panel -->
+<div class="lg:col-span-7">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 md:p-10 hover:ambient-shadow transition-all duration-300 h-full">
+<div class="mb-10">
+<h2 class="text-headline-lg-mobile md:text-headline-lg font-headline-lg-mobile md:font-headline-lg text-primary mb-3">Napisz wiadomość</h2>
+<p class="text-body-md font-body-md text-on-surface-variant">Wypełnij formularz, a skontaktujemy się z Tobą najszybciej jak to możliwe.</p>
+</div>
+<form class="space-y-8">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="space-y-2">
+<label class="block text-label-md font-label-md text-primary" for="firstName">Imię</label>
+<input class="w-full bg-surface-bright border border-outline-variant rounded-lg px-4 py-4 text-body-md font-body-md focus:outline-none focus:ring-2 focus:ring-secondary-container focus:border-transparent transition-all placeholder:text-outline-variant" id="firstName" placeholder="Jan" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="block text-label-md font-label-md text-primary" for="lastName">Nazwisko</label>
+<input class="w-full bg-surface-bright border border-outline-variant rounded-lg px-4 py-4 text-body-md font-body-md focus:outline-none focus:ring-2 focus:ring-secondary-container focus:border-transparent transition-all placeholder:text-outline-variant" id="lastName" placeholder="Kowalski" type="text"/>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="space-y-2">
+<label class="block text-label-md font-label-md text-primary" for="phone">Numer telefonu</label>
+<input class="w-full bg-surface-bright border border-outline-variant rounded-lg px-4 py-4 text-body-md font-body-md focus:outline-none focus:ring-2 focus:ring-secondary-container focus:border-transparent transition-all placeholder:text-outline-variant" id="phone" placeholder="+48 ___ ___ ___" type="tel"/>
+</div>
+<div class="space-y-2">
+<label class="block text-label-md font-label-md text-primary" for="email">Adres email</label>
+<input class="w-full bg-surface-bright border border-outline-variant rounded-lg px-4 py-4 text-body-md font-body-md focus:outline-none focus:ring-2 focus:ring-secondary-container focus:border-transparent transition-all placeholder:text-outline-variant" id="email" placeholder="jan@example.com" type="email"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="block text-label-md font-label-md text-primary" for="subject">Temat zapytania (Przedmiot)</label>
+<select class="w-full bg-surface-bright border border-outline-variant rounded-lg px-4 py-4 text-body-md font-body-md focus:outline-none focus:ring-2 focus:ring-secondary-container focus:border-transparent transition-all text-on-surface appearance-none" id="subject" style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%23737780%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E'); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1.5em;">
+<option disabled="" selected="" value="">Wybierz z listy...</option>
+<option value="math">Matematyka</option>
+<option value="physics">Fizyka</option>
+<option value="english">Język angielski</option>
+<option value="other">Inny</option>
+</select>
+</div>
+<div class="space-y-2">
+<label class="block text-label-md font-label-md text-primary" for="message">Twoja wiadomość</label>
+<textarea class="w-full bg-surface-bright border border-outline-variant rounded-lg px-4 py-4 text-body-md font-body-md focus:outline-none focus:ring-2 focus:ring-secondary-container focus:border-transparent transition-all resize-none placeholder:text-outline-variant" id="message" placeholder="Jak możemy pomóc?" rows="5"></textarea>
+</div>
+<div class="pt-4">
+<button class="w-full md:w-auto bg-secondary-container text-on-secondary font-label-md text-label-md px-10 py-5 rounded-lg hover:bg-warm-orange-hover transition-all active:scale-95 duration-150 shadow-sm flex items-center justify-center gap-3 group" type="button">
+<span>Wyślij wiadomość</span>
+<span class="material-symbols-outlined text-xl group-hover:translate-x-1 transition-transform" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="bg-academic-navy-deep dark:bg-primary w-full py-section-gap">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<!-- Brand -->
+<div class="flex flex-col gap-4">
+<span class="text-headline-md font-headline-md text-surface-container-lowest">Centrum Chabówka</span>
+<p class="text-surface-container-highest font-body-md text-body-md mt-2 max-w-xs">Twoje zaufane centrum korepetycji. Pomagamy uczniom odkryć ich pełny potencjał akademicki.</p>
+</div>
+<!-- Links -->
+<div class="flex flex-col gap-3">
+<h4 class="text-secondary-fixed font-label-md text-label-md uppercase tracking-wider mb-2">Nawigacja</h4>
+<a class="text-surface-container-high hover:text-secondary-fixed transition-colors font-body-md text-body-md hover:underline" href="#">Przedmioty</a>
+<a class="text-surface-container-high hover:text-secondary-fixed transition-colors font-body-md text-body-md hover:underline" href="#">O nas</a>
+<a class="text-surface-container-high hover:text-secondary-fixed transition-colors font-body-md text-body-md hover:underline" href="#">Cennik</a>
+<a class="text-secondary-fixed font-bold font-body-md text-body-md hover:underline" href="#">Kontakt</a>
+</div>
+<!-- Legal -->
+<div class="flex flex-col gap-3">
+<h4 class="text-secondary-fixed font-label-md text-label-md uppercase tracking-wider mb-2">Informacje prawne</h4>
+<a class="text-surface-container-high hover:text-secondary-fixed transition-colors font-body-md text-body-md hover:underline" href="#">Polityka Prywatności</a>
+<a class="text-surface-container-high hover:text-secondary-fixed transition-colors font-body-md text-body-md hover:underline" href="#">Regulamin</a>
+</div>
+<div class="col-span-1 md:col-span-3 mt-12 pt-8 border-t border-surface-tint">
+<p class="text-surface-container-lowest font-body-md text-body-md text-center opacity-80">© 2024 Centrum Korepetycji Chabówka. Wszelkie prawa zastrzeżone.</p>
+</div>
+</div>
+</footer>
+</body></html>
