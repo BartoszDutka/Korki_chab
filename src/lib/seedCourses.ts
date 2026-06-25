@@ -1,5 +1,5 @@
 import { collection, addDoc, getDocs, doc, updateDoc, type Firestore } from 'firebase/firestore'
-import { db as defaultDb } from '../lib/firebase'
+import { getDb } from '../lib/firebase'
 import type { Course } from '../types'
 
 const now = () => new Date().toISOString()
@@ -181,8 +181,9 @@ export const SAMPLE_COURSES: Omit<Course, 'id'>[] = [
   },
 ]
 
-export async function seedCoursesData(firestore: Firestore = defaultDb): Promise<number> {
-  const snap = await getDocs(collection(firestore, 'courses'))
+export async function seedCoursesData(firestore?: Firestore): Promise<number> {
+  const db = firestore ?? (await getDb())
+  const snap = await getDocs(collection(db, 'courses'))
   const existing = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Course))
   const bySlug = new Map(existing.map((c) => [c.slug, c]))
 
@@ -196,7 +197,7 @@ export async function seedCoursesData(firestore: Firestore = defaultDb): Promise
         found.status === 'hidden' ||
         found.status === 'finished'
       if (needsPublish) {
-        await updateDoc(doc(firestore, 'courses', found.id), {
+        await updateDoc(doc(db, 'courses', found.id), {
           visible: true,
           status: 'active',
           updatedAt: now(),
@@ -205,7 +206,7 @@ export async function seedCoursesData(firestore: Firestore = defaultDb): Promise
       }
       continue
     }
-    await addDoc(collection(firestore, 'courses'), sample)
+    await addDoc(collection(db, 'courses'), sample)
     changed += 1
   }
 

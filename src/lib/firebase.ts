@@ -1,6 +1,6 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app'
-import { getFirestore, type Firestore } from 'firebase/firestore'
-import { getAuth, type Auth } from 'firebase/auth'
+import type { Firestore } from 'firebase/firestore'
+import type { Auth } from 'firebase/auth'
 import type { FirebaseStorage } from 'firebase/storage'
 import type { Analytics } from 'firebase/analytics'
 
@@ -23,8 +23,33 @@ const firebaseConfig = {
 
 export const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig)
 
-export const db: Firestore = getFirestore(app)
-export const auth: Auth = getAuth(app)
+let dbInstance: Firestore | null = null
+let dbPromise: Promise<Firestore> | null = null
+
+export function getDb(): Promise<Firestore> {
+  if (dbInstance) return Promise.resolve(dbInstance)
+  if (!dbPromise) {
+    dbPromise = import('firebase/firestore').then(({ getFirestore }) => {
+      dbInstance = getFirestore(app)
+      return dbInstance
+    })
+  }
+  return dbPromise
+}
+
+let authInstance: Auth | null = null
+let authPromise: Promise<Auth> | null = null
+
+export function getAuthInstance(): Promise<Auth> {
+  if (authInstance) return Promise.resolve(authInstance)
+  if (!authPromise) {
+    authPromise = import('firebase/auth').then(({ getAuth }) => {
+      authInstance = getAuth(app)
+      return authInstance
+    })
+  }
+  return authPromise
+}
 
 let storageInstance: FirebaseStorage | null = null
 

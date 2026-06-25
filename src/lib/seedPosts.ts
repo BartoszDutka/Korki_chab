@@ -1,5 +1,5 @@
 import { collection, addDoc, getDocs, doc, updateDoc, type Firestore } from 'firebase/firestore'
-import { db as defaultDb } from '../lib/firebase'
+import { getDb } from '../lib/firebase'
 import type { Post } from '../types'
 
 const now = () => new Date().toISOString()
@@ -98,8 +98,9 @@ export const SAMPLE_POSTS: Omit<Post, 'id'>[] = [
   },
 ]
 
-export async function seedPostsData(firestore: Firestore = defaultDb): Promise<number> {
-  const snap = await getDocs(collection(firestore, 'posts'))
+export async function seedPostsData(firestore?: Firestore): Promise<number> {
+  const db = firestore ?? (await getDb())
+  const snap = await getDocs(collection(db, 'posts'))
   const existing = snap.docs.map((d) => ({ id: d.id, ...d.data() } as Post))
   const bySlug = new Map(existing.map((p) => [p.slug, p]))
 
@@ -109,7 +110,7 @@ export async function seedPostsData(firestore: Firestore = defaultDb): Promise<n
     const found = bySlug.get(sample.slug)
     if (found) {
       if (found.status !== 'published') {
-        await updateDoc(doc(firestore, 'posts', found.id), {
+        await updateDoc(doc(db, 'posts', found.id), {
           status: 'published',
           updatedAt: now(),
         })
@@ -117,7 +118,7 @@ export async function seedPostsData(firestore: Firestore = defaultDb): Promise<n
       }
       continue
     }
-    await addDoc(collection(firestore, 'posts'), sample)
+    await addDoc(collection(db, 'posts'), sample)
     changed += 1
   }
 

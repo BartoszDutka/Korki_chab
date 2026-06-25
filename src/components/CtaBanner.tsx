@@ -19,7 +19,7 @@ export default function CtaBanner() {
         <div className="shrink-0 flex flex-col sm:flex-row gap-4">
           <a
             href={`tel:${CONTACT.phone.replace(/\s/g, '')}`}
-            className="inline-flex items-center justify-center gap-3 bg-secondary-container hover:bg-warm-orange-hover text-on-secondary px-8 md:px-10 py-4 md:py-5 rounded-xl font-medium text-label-md font-bold shadow-lg transition-all active:scale-95"
+            className="inline-flex items-center justify-center gap-3 bg-secondary-container hover:bg-warm-orange-hover text-on-secondary px-8 md:px-10 py-4 md:py-5 rounded-xl font-medium text-label-md font-bold shadow-lg transition-[transform,opacity,background-color,box-shadow] active:scale-95"
           >
             <Icon name="call" />
             Zadzwoń teraz

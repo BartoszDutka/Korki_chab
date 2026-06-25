@@ -38,6 +38,26 @@ export function PostCardSkeleton() {
   )
 }
 
+export function TestimonialCardSkeleton() {
+  return (
+    <div className="bg-white border border-outline-variant rounded-xl p-6 min-h-[180px]">
+      <SkeletonBlock className="h-4 w-24 mb-3" />
+      <SkeletonBlock className="h-4 w-full mb-2" />
+      <SkeletonBlock className="h-4 w-full mb-2" />
+      <SkeletonBlock className="h-4 w-5/6 mb-6" />
+      <SkeletonBlock className="h-5 w-32" />
+    </div>
+  )
+}
+
+export function FaqItemSkeleton() {
+  return (
+    <div className="bg-white border border-outline-variant rounded-xl p-6 min-h-[72px]">
+      <SkeletonBlock className="h-5 w-4/5" />
+    </div>
+  )
+}
+
 export function ArticleRowSkeleton() {
   return (
     <div className="bg-white border border-outline-variant rounded-xl p-6 md:p-8 min-h-[160px]">

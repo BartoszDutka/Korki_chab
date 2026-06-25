@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState, useCallback, useMemo, type ReactNode } from 'react'
 import { useAuth } from './AuthContext'
 import type { Course, CartItem } from '../types'
-import { cartsService } from '../services/cartsService'
 import { isCourseBookable } from '../lib/courseUtils'
 
 interface CartContextValue {
@@ -28,16 +27,20 @@ export function CartProvider({ children }: { children: ReactNode }) {
       return
     }
     setLoading(true)
-    const unsub = cartsService.subscribe(user.uid, (cart) => {
-      setItems(cart?.items ?? [])
-      setLoading(false)
+    let unsub: (() => void) | undefined
+    void import('../services/cartsService').then(({ cartsService }) => {
+      unsub = cartsService.subscribe(user.uid, (cart) => {
+        setItems(cart?.items ?? [])
+        setLoading(false)
+      })
     })
-    return unsub
+    return () => unsub?.()
   }, [user])
 
   const persist = useCallback(
     async (newItems: CartItem[]) => {
       if (!user) return
+      const { cartsService } = await import('../services/cartsService')
       setItems(newItems)
       await cartsService.save(user.uid, newItems)
     },
@@ -73,6 +76,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clear = useCallback(async () => {
     if (!user) return
+    const { cartsService } = await import('../services/cartsService')
     await cartsService.clear(user.uid)
     setItems([])
   }, [user])

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 
 function scheduleIdle(task: () => void, timeout = 2000) {
   if ('requestIdleCallback' in window) {
@@ -12,11 +12,14 @@ function scheduleIdle(task: () => void, timeout = 2000) {
 export function useDeferredOnce<T>(fetch: () => Promise<T>) {
   const [data, setData] = useState<T | null>(null)
   const [settled, setSettled] = useState(false)
+  const fetchRef = useRef(fetch)
+  fetchRef.current = fetch
 
   useEffect(() => {
     let cancelled = false
     scheduleIdle(() => {
-      fetch()
+      fetchRef
+        .current()
         .then((result) => {
           if (!cancelled) {
             setData(result)
@@ -30,7 +33,7 @@ export function useDeferredOnce<T>(fetch: () => Promise<T>) {
     return () => {
       cancelled = true
     }
-  }, [fetch])
+  }, [])
 
   return { data, settled }
 }

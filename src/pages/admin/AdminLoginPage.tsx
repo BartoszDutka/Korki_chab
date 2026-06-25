@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
-import { auth } from '../../lib/firebase'
+import { getAuthInstance } from '../../lib/firebase'
 import { usersService } from '../../services/usersService'
 import { isAdminEmail } from '../../types'
 import { inputClass } from '../../components/admin/AdminUi'
@@ -24,6 +24,7 @@ export default function AdminLoginPage() {
     setSubmitting(true)
     try {
       await login(email, password)
+      const auth = await getAuthInstance()
       const currentUser = auth.currentUser
       if (!currentUser) {
         setError('Logowanie nie powiodło się.')

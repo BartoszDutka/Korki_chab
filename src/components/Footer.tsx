@@ -1,10 +1,14 @@
 import { Link } from 'react-router-dom'
+import { useCallback } from 'react'
 import { useDeferredOnce } from '../hooks/useDeferredOnce'
-import { footerService } from '../services/footerService'
 import { DEFAULT_FOOTER } from '../data/defaults'
 
 export default function Footer() {
-  const { data: footerRaw } = useDeferredOnce(footerService.get)
+  const fetchFooter = useCallback(
+    () => import('../services/footerService').then((m) => m.footerService.get()),
+    [],
+  )
+  const { data: footerRaw } = useDeferredOnce(fetchFooter)
   const footer = footerRaw ?? DEFAULT_FOOTER
 
   return (

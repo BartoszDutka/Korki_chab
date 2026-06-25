@@ -86,11 +86,25 @@
 
 @layer utilities {
   .card-hover {
-    @apply transition-all duration-300;
+    @apply transition-[transform,box-shadow] duration-300;
   }
 
   .card-hover:hover {
     box-shadow: 0 12px 30px -10px rgba(0, 30, 64, 0.1);
     transform: translateY(-4px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }

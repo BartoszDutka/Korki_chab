@@ -1,14 +1,12 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useCart } from '../contexts/CartContext'
 import Icon from './ui'
 import { useDeferredOnce } from '../hooks/useDeferredOnce'
-import { menuService } from '../services/menuService'
-import { settingsService } from '../services/settingsService'
 import { DEFAULT_MENU, DEFAULT_SITE_SETTINGS } from '../data/defaults'
 
-const LOGO_SRC = '/LogoChab.png'
+const LOGO_SRC = '/LogoChab.svg'
 
 const FOOTER_ONLY_HREFS = ['/opinie', '/faq', '/kontakt']
 
@@ -39,8 +37,8 @@ function NavItem({
 }) {
   const isExternal = href.startsWith('http') || href.startsWith('tel:') || href.startsWith('mailto:')
   const className = compact
-    ? 'font-medium text-label-sm px-2 py-1.5 rounded-lg transition-all text-primary hover:text-secondary-container hover:bg-surface-container-low whitespace-nowrap'
-    : 'font-medium text-label-md px-3 py-2 rounded-lg transition-all text-primary hover:text-secondary-container hover:bg-surface-container-low'
+    ? 'font-medium text-label-sm px-2 py-1.5 rounded-lg transition-colors text-primary hover:text-secondary-container hover:bg-surface-container-low whitespace-nowrap'
+    : 'font-medium text-label-md px-3 py-2 rounded-lg transition-colors text-primary hover:text-secondary-container hover:bg-surface-container-low'
 
   if (isExternal) {
     return (
@@ -61,8 +59,16 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const { user, isAdmin, logout, signInWithGoogle, loading: authLoading } = useAuth()
   const { count } = useCart()
-  const { data: settingsDeferred } = useDeferredOnce(settingsService.get)
-  const { data: menuDeferred, settled: menuSettled } = useDeferredOnce(menuService.getAll)
+  const fetchSettings = useCallback(
+    () => import('../services/settingsService').then((m) => m.settingsService.get()),
+    [],
+  )
+  const fetchMenu = useCallback(
+    () => import('../services/menuService').then((m) => m.menuService.getAll()),
+    [],
+  )
+  const { data: settingsDeferred } = useDeferredOnce(fetchSettings)
+  const { data: menuDeferred, settled: menuSettled } = useDeferredOnce(fetchMenu)
   const menuItems = useMemo(() => {
     const items = menuDeferred ?? []
     const sorted = items.length === 0 ? DEFAULT_MENU : [...items].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
@@ -108,9 +114,9 @@ export default function Header() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-1 sm:gap-2 shrink-0 ml-auto min-h-[44px] min-w-[44px] lg:min-w-[200px] justify-end">
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0 ml-auto min-h-[44px] min-w-[44px] lg:min-w-[240px] justify-end">
             {authLoading ? (
-              <div className="hidden lg:block w-[200px] h-[44px]" aria-hidden="true" />
+              <div className="hidden lg:flex gap-2 w-[240px] h-[44px]" aria-hidden="true" />
             ) : user && !isAdmin ? (
               <>
                 <Link
@@ -183,7 +189,7 @@ export default function Header() {
       >
         <div className="flex justify-between items-center gap-3 p-4 border-b border-outline-variant">
           <Link to="/" className="flex items-center gap-2 min-w-0" onClick={closeMenu} aria-label={siteName}>
-            <SiteLogo className="h-8 w-auto max-h-9" />
+            <SiteLogo className="h-8 w-8" />
             <span className="font-bold text-academic-navy-deep truncate">{siteName}</span>
           </Link>
           <button

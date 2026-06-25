@@ -3,9 +3,9 @@ export const IMAGES = {
   heroWebp: '/hero-800.webp',
   heroWebpSrcSet: '/hero-480.webp 480w, /hero-800.webp 800w, /hero-1200.webp 1200w',
   heroJpg: '/hero.jpg',
-  /** Domyślne zdjęcie hero — działa bez plików w public/ */
+  /** Domyślne zdjęcie hero — wersja ~800px szerokości */
   heroRemote:
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuDJjwIqDmAGDJxF3UkJNKnzrdbRfYEIDjVW8nFpgrtmW2GJfHIumc1lHZI_kWVa_Ap5i7siDy4b9Qkua_-jWBSHKXzuLKl9h_VqjfjMIIMzdsg1iPE3zgmaO_PblQuxUyCfnEjOxHkMjnlDiwcbhhGN0As8hnUCMExDkoKxvN4lbSyuVXjC-C-zXzrprKR6QKIwvTHSYjYwujxroOkYgoY7d7QNz5MO0_qBnDKKOWMlbY5LZeNv_FTMBh3wdB_h7O--1mCwFIzFXoA',
+    'https://lh3.googleusercontent.com/aida-public/AB6AXuDJjwIqDmAGDJxF3UkJNKnzrdbRfYEIDjVW8nFpgrtmW2GJfHIumc1lHZI_kWVa_Ap5i7siDy4b9Qkua_-jWBSHKXzuLKl9h_VqjfjMIIMzdsg1iPE3zgmaO_PblQuxUyCfnEjOxHkMjnlDiwcbhhGN0As8hnUCMExDkoKxvN4lbSyuVXjC-C-zXzrprKR6QKIwvTHSYjYwujxroOkYgoY7d7QNz5MO0_qBnDKKOWMlbY5LZeNv_FTMBh3wdB_h7O--1mCwFIzFXoA=w800-rw',
   team: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAhiQfpaQVSRL9DJPYiXr9LKiRKTrxUWq1_tW7S6bVroOfPwzWm4dniVFxM2aS0YE1rbodzw3-RZqzB5iNQSqHgqC7VJzVFIso083Rodh1SW5DEtryinAAuhdcWlQE2Ua72_f0vvJ37WCOEgC1a82yiEO6bSejMhevd9SDXebEtZKhWxl_Z17W7Xki6Ho9ji1ZNnV9uWwCH6mRCNYf9aQmxLiHsdZkqjzlelTwguZA0TuAvtGZzoMjOGP9Nq3hbvk2uvShye7g68rY',
   mapDesktop:
     'https://lh3.googleusercontent.com/aida-public/AB6AXuA3p7qKuv_878s5pNZRlMegV0ZoIKGbye-ut-1MMFIdSul4eUPIp-eNhDJUHZvlPpsMpRz2cd0lRGGs90bzQnWG_9x30DgJEB-iTWnYCDN-yW8PEj7MgNB80gyN4oPgw7KDqZqczt4J2Nsi4v4K3mWUk_hVOiXpH9miXW1PRyn5O7mhPq5kjBqxxR3KGEGLm3L6wu1lzx9-N3ebUB8AZOJaizuCUFTqYUdFixmZtVX3867bNUx073TWFoxr92JQjO4VPW8teZhEIPM',

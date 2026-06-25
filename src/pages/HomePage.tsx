@@ -1,14 +1,11 @@
-import { useMemo } from 'react'
+import { useMemo, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import Icon, { Button } from '../components/ui'
-import EditableText from '../components/live-edit/EditableText'
+import ConditionalEditable from '../components/ConditionalEditable'
+import ImageWithAspectRatio from '../components/ImageWithAspectRatio'
 import { useDeferredOnce } from '../hooks/useDeferredOnce'
 import { useSeo } from '../hooks/useSeo'
 import { SITE_URL } from '../lib/seo'
-import { settingsService } from '../services/settingsService'
-import { seoService } from '../services/seoService'
-import { postsService } from '../services/postsService'
-import { subjectsService } from '../services/subjectsService'
 import { DEFAULT_SITE_SETTINGS } from '../data/defaults'
 import { IMAGES, SUBJECTS } from '../data/content'
 import DataSetupBanner from '../components/DataSetupBanner'
@@ -25,10 +22,27 @@ const PLACEHOLDER_SUBJECTS: Subject[] = SUBJECTS.map((s, order) => ({
 }))
 
 export default function HomePage() {
-  const { data: settingsRaw, settled: settingsSettled } = useDeferredOnce(settingsService.get)
-  const { data: seoRaw } = useDeferredOnce(seoService.get)
-  const { data: postsRaw, settled: postsSettled } = useDeferredOnce(postsService.getAll)
-  const { data: subjectsRaw, settled: subjectsSettled } = useDeferredOnce(subjectsService.getAll)
+  const fetchSettings = useCallback(
+    () => import('../services/settingsService').then((m) => m.settingsService.get()),
+    [],
+  )
+  const fetchSeo = useCallback(
+    () => import('../services/seoService').then((m) => m.seoService.get()),
+    [],
+  )
+  const fetchPosts = useCallback(
+    () => import('../services/postsService').then((m) => m.postsService.getAll()),
+    [],
+  )
+  const fetchSubjects = useCallback(
+    () => import('../services/subjectsService').then((m) => m.subjectsService.getAll()),
+    [],
+  )
+
+  const { data: settingsRaw, settled: settingsSettled } = useDeferredOnce(fetchSettings)
+  const { data: seoRaw } = useDeferredOnce(fetchSeo)
+  const { data: postsRaw, settled: postsSettled } = useDeferredOnce(fetchPosts)
+  const { data: subjectsRaw, settled: subjectsSettled } = useDeferredOnce(fetchSubjects)
 
   const settings = settingsRaw ?? DEFAULT_SITE_SETTINGS
   const seo = seoRaw
@@ -49,6 +63,9 @@ export default function HomePage() {
 
   const showPostsSection = settings.sectionVisibility.posts
   const postsReady = postsSettled && publishedPosts.length > 0
+  const showAboutSection =
+    (settingsSettled ? settings.aboutVisible : DEFAULT_SITE_SETTINGS.aboutVisible) &&
+    settings.sectionVisibility.about
 
   const jsonLd = useMemo(
     () => ({
@@ -78,6 +95,11 @@ export default function HomePage() {
     jsonLd,
   })
 
+  const updateSettings = useCallback(async (patch: Record<string, unknown>) => {
+    const { settingsService } = await import('../services/settingsService')
+    await settingsService.update(patch)
+  }, [])
+
   return (
     <>
       {usingDefaults && <DataSetupBanner />}
@@ -85,26 +107,26 @@ export default function HomePage() {
         <div className="max-w-container-max mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           <div className="flex flex-col items-start space-y-6 md:space-y-8 min-h-[320px] sm:min-h-[360px]">
             <p className="text-label-md text-on-secondary-container font-bold uppercase tracking-wider min-h-[20px]">
-              <EditableText
+              <ConditionalEditable
                 value={settings.heroSubtitle}
-                onSave={(v) => settingsService.update({ heroSubtitle: v })}
+                onSave={(v) => updateSettings({ heroSubtitle: v })}
                 className="text-label-md"
               />
             </p>
             <h1 className="text-display-lg-mobile md:text-display-lg font-extrabold text-primary tracking-tight min-h-[2.5em]">
-              <EditableText
+              <ConditionalEditable
                 as="span"
                 value={settings.heroTitle}
-                onSave={(v) => settingsService.update({ heroTitle: v })}
+                onSave={(v) => updateSettings({ heroTitle: v })}
                 className="text-display-lg-mobile md:text-display-lg"
               />
             </h1>
             <p className="text-body-lg text-on-surface-variant max-w-lg min-h-[4.5rem]">
-              <EditableText
+              <ConditionalEditable
                 as="p"
                 multiline
                 value={settings.heroDescription}
-                onSave={(v) => settingsService.update({ heroDescription: v })}
+                onSave={(v) => updateSettings({ heroDescription: v })}
                 className="text-body-lg"
               />
             </p>
@@ -120,25 +142,17 @@ export default function HomePage() {
               ))}
             </div>
           </div>
-          <div className="relative hidden lg:block w-full rounded-2xl overflow-hidden shadow-sm bg-academic-navy-deep aspect-[800/550] max-h-[550px]">
-            <img
+          <div className="hidden lg:block w-full max-h-[550px] rounded-2xl overflow-hidden shadow-sm bg-academic-navy-deep">
+            <ImageWithAspectRatio
               src={IMAGES.heroRemote}
               alt="Nowoczesna sala lekcyjna w Centrum Korepetycji Chabówka"
               width={800}
               height={550}
-              loading="eager"
-              decoding="async"
-              fetchPriority="high"
+              priority
               sizes="(min-width: 1024px) 600px, 0px"
-              className="object-cover w-full h-full absolute inset-0 opacity-90"
-              referrerPolicy="no-referrer"
-              onError={(e) => {
-                const img = e.currentTarget
-                if (!img.dataset.triedLocal) {
-                  img.dataset.triedLocal = '1'
-                  img.src = IMAGES.heroJpg
-                }
-              }}
+              webpSrc={IMAGES.heroWebpSrcSet}
+              fallbackSrc={IMAGES.heroJpg}
+              className="opacity-90"
             />
           </div>
         </div>
@@ -197,14 +211,14 @@ export default function HomePage() {
         </section>
       )}
 
-      {settings.aboutVisible && settings.sectionVisibility.about && (
+      {showAboutSection && (
         <section className="py-section-gap px-margin-mobile md:px-margin-desktop bg-surface-bright min-h-[280px]">
           <div className="max-w-container-max mx-auto max-w-3xl">
             <h2 className="text-headline-lg-mobile md:text-headline-lg font-bold text-primary mb-6 min-h-[2rem]">
-              <EditableText value={settings.aboutTitle} onSave={(v) => settingsService.update({ aboutTitle: v })} />
+              <ConditionalEditable value={settings.aboutTitle} onSave={(v) => updateSettings({ aboutTitle: v })} />
             </h2>
             <p className="text-body-lg text-on-surface-variant mb-6 min-h-[4rem]">
-              <EditableText multiline value={settings.aboutContent} onSave={(v) => settingsService.update({ aboutContent: v })} />
+              <ConditionalEditable multiline value={settings.aboutContent} onSave={(v) => updateSettings({ aboutContent: v })} />
             </p>
             <div className="flex flex-wrap gap-2 min-h-[32px]">
               {settings.aboutLocations.map((loc) => (

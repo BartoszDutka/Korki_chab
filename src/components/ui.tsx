@@ -24,7 +24,7 @@ export function Button({
   ariaLabel,
 }: ButtonProps) {
   const base =
-    'inline-flex items-center justify-center gap-2 font-semibold text-label-md rounded-lg transition-all active:scale-95 duration-150 min-h-[44px] min-w-[44px]'
+    'inline-flex items-center justify-center gap-2 font-semibold text-label-md rounded-lg transition-[transform,opacity,background-color,box-shadow,border-color] active:scale-95 duration-150 min-h-[44px] min-w-[44px]'
 
   const variants = {
     primary:

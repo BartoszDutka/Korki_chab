@@ -1,12 +1,5 @@
-import {
-  collection,
-  onSnapshot,
-  query,
-  orderBy,
-  where,
-  type Unsubscribe,
-} from 'firebase/firestore'
-import { db } from '../lib/firebase'
+import type { Unsubscribe } from 'firebase/firestore'
+import { getDb } from '../lib/firebase'
 import type { Enrollment, EnrollmentStatus } from '../types'
 import {
   getCollection,
@@ -21,31 +14,57 @@ const COL = 'enrollments'
 export const enrollmentsService = {
   getAll: () => getCollection<Enrollment>(COL),
   subscribe: (cb: (items: Enrollment[]) => void): Unsubscribe => {
-    const q = query(collection(db, COL), orderBy('createdAt', 'desc'))
-    return onSnapshot(
-      q,
-      (snap) => cb(snap.docs.map((d) => mapDoc<Enrollment>(d.id, d.data()))),
-      (error) => {
-        if (import.meta.env.DEV) console.warn('enrollmentsService.subscribe:', error)
-        cb([])
+    let unsub: Unsubscribe | undefined
+    let cancelled = false
+
+    void Promise.all([import('firebase/firestore'), getDb()]).then(
+      ([{ collection, onSnapshot, query, orderBy }, db]) => {
+        if (cancelled) return
+        const q = query(collection(db, COL), orderBy('createdAt', 'desc'))
+        unsub = onSnapshot(
+          q,
+          (snap) => cb(snap.docs.map((d) => mapDoc<Enrollment>(d.id, d.data()))),
+          (error) => {
+            if (import.meta.env.DEV) console.warn('enrollmentsService.subscribe:', error)
+            cb([])
+          },
+        )
       },
     )
+
+    return () => {
+      cancelled = true
+      unsub?.()
+    }
   },
   subscribeByUser: (userId: string, cb: (items: Enrollment[]) => void): Unsubscribe => {
-    const q = query(collection(db, COL), where('userId', '==', userId))
-    return onSnapshot(
-      q,
-      (snap) => {
-        const items = snap.docs
-          .map((d) => mapDoc<Enrollment>(d.id, d.data()))
-          .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-        cb(items)
-      },
-      (error) => {
-        if (import.meta.env.DEV) console.warn('enrollmentsService.subscribeByUser:', error)
-        cb([])
+    let unsub: Unsubscribe | undefined
+    let cancelled = false
+
+    void Promise.all([import('firebase/firestore'), getDb()]).then(
+      ([{ collection, onSnapshot, query, where }, db]) => {
+        if (cancelled) return
+        const q = query(collection(db, COL), where('userId', '==', userId))
+        unsub = onSnapshot(
+          q,
+          (snap) => {
+            const items = snap.docs
+              .map((d) => mapDoc<Enrollment>(d.id, d.data()))
+              .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+            cb(items)
+          },
+          (error) => {
+            if (import.meta.env.DEV) console.warn('enrollmentsService.subscribeByUser:', error)
+            cb([])
+          },
+        )
       },
     )
+
+    return () => {
+      cancelled = true
+      unsub?.()
+    }
   },
   subscribeByCourse: (courseId: string, cb: (items: Enrollment[]) => void): Unsubscribe => {
     return enrollmentsService.subscribe((all) => {

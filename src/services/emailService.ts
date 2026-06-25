@@ -13,7 +13,9 @@ export interface EmailPayload {
 }
 
 function logEmail(payload: EmailPayload) {
-  console.info('[email stub]', payload.to, payload.subject)
+  if (import.meta.env.DEV) {
+    console.info('[email stub]', payload.to, payload.subject)
+  }
 }
 
 export function buildAdminEnrollmentEmail(

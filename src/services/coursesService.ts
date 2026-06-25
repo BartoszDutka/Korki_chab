@@ -1,12 +1,5 @@
-import {
-  collection,
-  onSnapshot,
-  query,
-  orderBy,
-  where,
-  type Unsubscribe,
-} from 'firebase/firestore'
-import { db } from '../lib/firebase'
+import type { Unsubscribe } from 'firebase/firestore'
+import { getDb } from '../lib/firebase'
 import type { Course } from '../types'
 import {
   getCollection,
@@ -30,36 +23,60 @@ function sortByOrder(courses: Course[]): Course[] {
 
 export const coursesService = {
   getAll: () => getCollection<Course>(COL),
-  /** Public — widoczne, aktywne lub pełne (zgodne z regułami Firestore) */
   subscribe: (cb: (items: Course[]) => void): Unsubscribe => {
-    const q = query(
-      collection(db, COL),
-      where('visible', '==', true),
-      where('status', 'in', ['active', 'full']),
-    )
-    return onSnapshot(
-      q,
-      (snap) => {
-        const items = snap.docs.map((d) => mapDoc<Course>(d.id, d.data()))
-        cb(sortByOrder(items))
+    let unsub: Unsubscribe | undefined
+    let cancelled = false
+
+    void Promise.all([import('firebase/firestore'), getDb()]).then(
+      ([{ collection, onSnapshot, query, where }, db]) => {
+        if (cancelled) return
+        const q = query(
+          collection(db, COL),
+          where('visible', '==', true),
+          where('status', 'in', ['active', 'full']),
+        )
+        unsub = onSnapshot(
+          q,
+          (snap) => {
+            const items = snap.docs.map((d) => mapDoc<Course>(d.id, d.data()))
+            cb(sortByOrder(items))
+          },
+          (error) => {
+            logFirestoreError('courses subscribe', error)
+            cb([])
+          },
+        )
       },
-      (error) => {
-        logFirestoreError('courses subscribe', error)
-        cb([])
-      },
     )
+
+    return () => {
+      cancelled = true
+      unsub?.()
+    }
   },
-  /** Admin — wszystkie zajęcia */
   subscribeAll: (cb: (items: Course[]) => void): Unsubscribe => {
-    const q = query(collection(db, COL), orderBy('order'))
-    return onSnapshot(
-      q,
-      (snap) => cb(snap.docs.map((d) => mapDoc<Course>(d.id, d.data()))),
-      (error) => {
-        logFirestoreError('courses subscribeAll', error)
-        cb([])
+    let unsub: Unsubscribe | undefined
+    let cancelled = false
+
+    void Promise.all([import('firebase/firestore'), getDb()]).then(
+      ([{ collection, onSnapshot, query, orderBy }, db]) => {
+        if (cancelled) return
+        const q = query(collection(db, COL), orderBy('order'))
+        unsub = onSnapshot(
+          q,
+          (snap) => cb(snap.docs.map((d) => mapDoc<Course>(d.id, d.data()))),
+          (error) => {
+            logFirestoreError('courses subscribeAll', error)
+            cb([])
+          },
+        )
       },
     )
+
+    return () => {
+      cancelled = true
+      unsub?.()
+    }
   },
   add: (item: Omit<Course, 'id'>) => addCollectionItem(COL, item),
   update: (id: string, data: Partial<Course>) => updateCollectionItem(COL, id, data),

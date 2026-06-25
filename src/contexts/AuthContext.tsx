@@ -1,18 +1,8 @@
 import { createContext, useContext, useEffect, useState, useMemo, useCallback, type ReactNode } from 'react'
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  updateProfile,
-  signInWithPopup,
-  GoogleAuthProvider,
-  signOut,
-  onAuthStateChanged,
-  type User,
-} from 'firebase/auth'
-import { auth } from '../lib/firebase'
+import type { User } from 'firebase/auth'
+import { getAuthInstance } from '../lib/firebase'
 import type { UserProfile } from '../types'
 import { isAdminEmail } from '../types'
-import { usersService } from '../services/usersService'
 
 interface AuthContextValue {
   user: User | null
@@ -36,7 +26,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let unsub: (() => void) | undefined
 
-    const start = () => {
+    const start = async () => {
+      const [{ onAuthStateChanged }, auth] = await Promise.all([
+        import('firebase/auth'),
+        getAuthInstance(),
+      ])
+      const { usersService } = await import('../services/usersService')
       unsub = onAuthStateChanged(auth, async (u) => {
         setUser(u)
         if (u) {
@@ -54,9 +49,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     if ('requestIdleCallback' in window) {
-      window.requestIdleCallback(start, { timeout: 2500 })
+      window.requestIdleCallback(() => void start(), { timeout: 2500 })
     } else {
-      globalThis.setTimeout(start, 300)
+      globalThis.setTimeout(() => void start(), 300)
     }
 
     return () => {
@@ -65,10 +60,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const login = useCallback(async (email: string, password: string) => {
+    const [{ signInWithEmailAndPassword }, auth] = await Promise.all([
+      import('firebase/auth'),
+      getAuthInstance(),
+    ])
     await signInWithEmailAndPassword(auth, email, password)
   }, [])
 
   const register = useCallback(async (email: string, password: string, displayName?: string) => {
+    const [{ createUserWithEmailAndPassword, updateProfile }, auth] = await Promise.all([
+      import('firebase/auth'),
+      getAuthInstance(),
+    ])
+    const { usersService } = await import('../services/usersService')
     const cred = await createUserWithEmailAndPassword(auth, email, password)
     if (displayName?.trim()) {
       await updateProfile(cred.user, { displayName: displayName.trim() })
@@ -80,11 +84,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const signInWithGoogle = useCallback(async () => {
-    const provider = new GoogleAuthProvider()
-    await signInWithPopup(auth, provider)
+    const [{ signInWithPopup, GoogleAuthProvider }, auth] = await Promise.all([
+      import('firebase/auth'),
+      getAuthInstance(),
+    ])
+    await signInWithPopup(auth, new GoogleAuthProvider())
   }, [])
 
   const logout = useCallback(async () => {
+    const [{ signOut }, auth] = await Promise.all([
+      import('firebase/auth'),
+      getAuthInstance(),
+    ])
     await signOut(auth)
   }, [])
 

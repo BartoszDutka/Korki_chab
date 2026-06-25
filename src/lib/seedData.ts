@@ -1,5 +1,5 @@
 import { doc, getDoc, setDoc, collection, addDoc, type Firestore } from 'firebase/firestore'
-import { db as defaultDb } from '../lib/firebase'
+import { getDb } from '../lib/firebase'
 import { SINGLE_DOC_ID } from '../types'
 import { SAMPLE_POSTS } from './seedPosts'
 import type {
@@ -18,13 +18,15 @@ import type {
 
 const now = () => new Date().toISOString()
 
-export async function isDatabaseEmpty(firestore: Firestore = defaultDb): Promise<boolean> {
-  const snap = await getDoc(doc(firestore, 'siteSettings', SINGLE_DOC_ID))
+export async function isDatabaseEmpty(firestore?: Firestore): Promise<boolean> {
+  const db = firestore ?? (await getDb())
+  const snap = await getDoc(doc(db, 'siteSettings', SINGLE_DOC_ID))
   return !snap.exists()
 }
 
-export async function seedInitialData(firestore: Firestore = defaultDb): Promise<boolean> {
-  if (!(await isDatabaseEmpty(firestore))) {
+export async function seedInitialData(firestore?: Firestore): Promise<boolean> {
+  const db = firestore ?? (await getDb())
+  if (!(await isDatabaseEmpty(db))) {
     return false
   }
 
@@ -73,7 +75,7 @@ export async function seedInitialData(firestore: Firestore = defaultDb): Promise
       'Dokładna cena zależy od poziomu ucznia, przedmiotu i formy zajęć.',
   }
 
-  await setDoc(doc(firestore, 'siteSettings', SINGLE_DOC_ID), siteSettings)
+  await setDoc(doc(db, 'siteSettings', SINGLE_DOC_ID), siteSettings)
 
   const menuItems: Omit<MenuItem, 'id'>[] = [
     { label: 'Start', href: '/', order: 0, visible: true },
@@ -84,7 +86,7 @@ export async function seedInitialData(firestore: Firestore = defaultDb): Promise
   ]
 
   for (const item of menuItems) {
-    await addDoc(collection(firestore, 'menuItems'), item)
+    await addDoc(collection(db, 'menuItems'), item)
   }
 
   const subjects: Omit<Subject, 'id'>[] = [
@@ -99,7 +101,7 @@ export async function seedInitialData(firestore: Firestore = defaultDb): Promise
   ]
 
   for (const s of subjects) {
-    await addDoc(collection(firestore, 'subjects'), s)
+    await addDoc(collection(db, 'subjects'), s)
   }
 
   const levels: Omit<EducationLevel, 'id'>[] = [
@@ -111,7 +113,7 @@ export async function seedInitialData(firestore: Firestore = defaultDb): Promise
   ]
 
   for (const l of levels) {
-    await addDoc(collection(firestore, 'educationLevels'), l)
+    await addDoc(collection(db, 'educationLevels'), l)
   }
 
   const pricing: Omit<PricingItem, 'id'>[] = [
@@ -122,11 +124,11 @@ export async function seedInitialData(firestore: Firestore = defaultDb): Promise
   ]
 
   for (const p of pricing) {
-    await addDoc(collection(firestore, 'pricingItems'), p)
+    await addDoc(collection(db, 'pricingItems'), p)
   }
 
   for (const post of SAMPLE_POSTS) {
-    await addDoc(collection(firestore, 'posts'), post)
+    await addDoc(collection(db, 'posts'), post)
   }
 
   const testimonials: Omit<Testimonial, 'id'>[] = [
@@ -160,7 +162,7 @@ export async function seedInitialData(firestore: Firestore = defaultDb): Promise
   ]
 
   for (const t of testimonials) {
-    await addDoc(collection(firestore, 'testimonials'), t)
+    await addDoc(collection(db, 'testimonials'), t)
   }
 
   const faqItems: Omit<FAQItem, 'id'>[] = [
@@ -177,7 +179,7 @@ export async function seedInitialData(firestore: Firestore = defaultDb): Promise
   ]
 
   for (const f of faqItems) {
-    await addDoc(collection(firestore, 'faqItems'), f)
+    await addDoc(collection(db, 'faqItems'), f)
   }
 
   const contactSettings: ContactSettings = {
@@ -192,7 +194,7 @@ export async function seedInitialData(firestore: Firestore = defaultDb): Promise
     stationaryInfo: 'Zajęcia stacjonarne w naszej placówce w Chabówce.',
   }
 
-  await setDoc(doc(firestore, 'contactSettings', SINGLE_DOC_ID), contactSettings)
+  await setDoc(doc(db, 'contactSettings', SINGLE_DOC_ID), contactSettings)
 
   const formSettings: FormSettings = {
     fields: [
@@ -211,7 +213,7 @@ export async function seedInitialData(firestore: Firestore = defaultDb): Promise
     targetEmail: 'kontakt@centrumchabowka.pl',
   }
 
-  await setDoc(doc(firestore, 'formSettings', SINGLE_DOC_ID), formSettings)
+  await setDoc(doc(db, 'formSettings', SINGLE_DOC_ID), formSettings)
 
   const footerSettings: FooterSettings = {
     footerTitle: 'Centrum Chabówka',
@@ -231,7 +233,7 @@ export async function seedInitialData(firestore: Firestore = defaultDb): Promise
     copyright: '© 2026 Centrum Korepetycji Chabówka. Wszelkie prawa zastrzeżone.',
   }
 
-  await setDoc(doc(firestore, 'footerSettings', SINGLE_DOC_ID), footerSettings)
+  await setDoc(doc(db, 'footerSettings', SINGLE_DOC_ID), footerSettings)
 
   const seoSettings: SeoSettings = {
     defaultMetaTitle: 'Korepetycje Chabówka | Matematyka, angielski, matura',
@@ -251,7 +253,7 @@ export async function seedInitialData(firestore: Firestore = defaultDb): Promise
     ],
   }
 
-  await setDoc(doc(firestore, 'seoSettings', SINGLE_DOC_ID), seoSettings)
+  await setDoc(doc(db, 'seoSettings', SINGLE_DOC_ID), seoSettings)
 
   return true
 }
