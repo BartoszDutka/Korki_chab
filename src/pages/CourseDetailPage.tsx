@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useFirestoreCollection } from '../hooks/useFirestore'
 import { coursesService } from '../services/coursesService'
-import { computeSeatsAvailable, formatCoursePrice, availabilityLabel, isCourseBookable, courseToSelectedCourse } from '../lib/courseUtils'
+import { normalizeCourseSeats, formatCoursePrice, availabilityLabel, isCourseBookable, courseToSelectedCourse } from '../lib/courseUtils'
 import { useSeo } from '../hooks/useSeo'
 import PageLoader from '../components/PageLoader'
 import EnrollmentForm from '../components/courses/EnrollmentForm'
@@ -21,15 +21,7 @@ export default function CourseDetailPage() {
   const course = useMemo(() => {
     const found = rawCourses.find((c) => c.slug === slug && c.visible)
     if (!found) return undefined
-    const seatsAvailable = computeSeatsAvailable(found.seatsLimit, found.seatsTaken)
-    return {
-      ...found,
-      seatsAvailable,
-      status:
-        found.status !== 'hidden' && found.status !== 'finished' && seatsAvailable === 0
-          ? 'full'
-          : found.status,
-    }
+    return normalizeCourseSeats(found)
   }, [rawCourses, slug])
 
   useSeo(
@@ -99,7 +91,7 @@ export default function CourseDetailPage() {
         <Detail label="Wolne miejsca" value={`${course.seatsAvailable} / ${course.seatsLimit}`} />
       </section>
 
-      {showGuestForm ? (
+      {showGuestForm && bookable ? (
         <section aria-labelledby="enroll-heading" className="border rounded-2xl p-6">
           <h2 id="enroll-heading" className="font-bold text-primary mb-4">Zapis bez konta</h2>
           <EnrollmentForm
@@ -115,6 +107,11 @@ export default function CourseDetailPage() {
         </section>
       ) : (
         <section className="flex flex-col gap-3" aria-label="Akcje zapisu">
+          {!bookable && (
+            <p className="rounded-xl bg-red-100 text-red-800 px-4 py-3 font-bold text-center">
+              Brak wolnych miejsc — zapis na te zajęcia jest niedostępny.
+            </p>
+          )}
           {bookable && course.allowCartEnrollment && (
             <button
               type="button"
@@ -125,7 +122,7 @@ export default function CourseDetailPage() {
             </button>
           )}
           {cartMsg && <p className="text-body-sm text-primary">{cartMsg}</p>}
-          {loggedIn && (
+          {loggedIn && bookable && (
             <Link
               to="/koszyk"
               className="text-secondary-container font-medium text-body-sm underline min-h-[44px] inline-flex items-center"
@@ -142,7 +139,7 @@ export default function CourseDetailPage() {
               Zapisz się bez konta
             </button>
           )}
-          {!loggedIn && (
+          {!loggedIn && bookable && (
             <button
               type="button"
               onClick={() => signInWithGoogle()}

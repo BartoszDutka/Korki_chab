@@ -1,35 +1,22 @@
 import { useMemo, useState, lazy, Suspense } from 'react'
 import { useFirestoreCollection } from '../hooks/useFirestore'
 import { coursesService } from '../services/coursesService'
-import { computeSeatsAvailable } from '../lib/courseUtils'
+import { normalizeCoursesSeats } from '../lib/courseUtils'
 import CourseCard from '../components/courses/CourseCard'
 import CourseFilters, { defaultCourseFilters, filterCourses } from '../components/courses/CourseFilters'
-import type { Course } from '../types'
 import { useSeo } from '../hooks/useSeo'
 import { CourseCardSkeleton, GridSkeleton } from '../components/skeletons'
 import PageLoader from '../components/PageLoader'
 
 const CourseModal = lazy(() => import('../components/courses/CourseModal'))
 
-function withComputedSeats(courses: Course[]): Course[] {
-  return courses.map((c) => ({
-    ...c,
-    seatsAvailable: computeSeatsAvailable(c.seatsLimit, c.seatsTaken),
-    status:
-      c.status !== 'hidden' && c.status !== 'finished' && computeSeatsAvailable(c.seatsLimit, c.seatsTaken) === 0
-        ? 'full'
-        : c.status === 'full' && computeSeatsAvailable(c.seatsLimit, c.seatsTaken) > 0
-          ? 'active'
-          : c.status,
-  }))
-}
-
 export default function ZajeciaPage() {
   const { allItems: rawCourses, loading: coursesLoading } = useFirestoreCollection(coursesService.subscribe)
   const [filters, setFilters] = useState(defaultCourseFilters)
-  const [selected, setSelected] = useState<Course | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
 
-  const courses = useMemo(() => withComputedSeats(rawCourses), [rawCourses])
+  const courses = useMemo(() => normalizeCoursesSeats(rawCourses), [rawCourses])
+  const selected = selectedId ? courses.find((c) => c.id === selectedId) ?? null : null
 
   const filtered = useMemo(() => filterCourses(courses, filters), [courses, filters])
 
@@ -83,7 +70,7 @@ export default function ZajeciaPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
               {filtered.map((course) => (
-                <CourseCard key={course.id} course={course} onOpen={setSelected} />
+                <CourseCard key={course.id} course={course} onOpen={(c) => setSelectedId(c.id)} />
               ))}
             </div>
           )}
@@ -92,7 +79,7 @@ export default function ZajeciaPage() {
 
       {selected && (
         <Suspense fallback={<PageLoader label="Ładowanie…" />}>
-          <CourseModal course={selected} onClose={() => setSelected(null)} />
+          <CourseModal course={selected} onClose={() => setSelectedId(null)} />
         </Suspense>
       )}
     </>

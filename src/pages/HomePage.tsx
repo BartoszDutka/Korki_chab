@@ -8,7 +8,7 @@ import PageLoader from '../components/PageLoader'
 import { useDeferredOnce } from '../hooks/useDeferredOnce'
 import { useSeo } from '../hooks/useSeo'
 import { SITE_URL } from '../lib/seo'
-import { computeSeatsAvailable } from '../lib/courseUtils'
+import { normalizeCoursesSeats } from '../lib/courseUtils'
 import { DEFAULT_SITE_SETTINGS } from '../data/defaults'
 import { IMAGES, SUBJECTS } from '../data/content'
 import DataSetupBanner from '../components/DataSetupBanner'
@@ -37,21 +37,8 @@ const PLACEHOLDER_SUBJECTS: Subject[] = SUBJECTS.map((s, order) => ({
   visible: true,
 }))
 
-function withComputedSeats(courses: Course[]): Course[] {
-  return courses.map((c) => ({
-    ...c,
-    seatsAvailable: computeSeatsAvailable(c.seatsLimit, c.seatsTaken),
-    status:
-      c.status !== 'hidden' && c.status !== 'finished' && computeSeatsAvailable(c.seatsLimit, c.seatsTaken) === 0
-        ? 'full'
-        : c.status === 'full' && computeSeatsAvailable(c.seatsLimit, c.seatsTaken) > 0
-          ? 'active'
-          : c.status,
-  }))
-}
-
 export default function HomePage() {
-  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
+  const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null)
 
   const fetchSettings = useCallback(
     () => import('../services/settingsService').then((m) => m.settingsService.get()),
@@ -91,10 +78,16 @@ export default function HomePage() {
   }, [postsRaw])
 
   const featuredCourses = useMemo(() => {
-    const fromFirestore = coursesRaw?.length ? withComputedSeats(coursesRaw) : []
-    const source = fromFirestore.length > 0 ? fromFirestore : withComputedSeats(FALLBACK_COURSES)
+    const fromFirestore = coursesRaw?.length ? normalizeCoursesSeats(coursesRaw) : []
+    const source = fromFirestore.length > 0 ? fromFirestore : normalizeCoursesSeats(FALLBACK_COURSES)
     return source.slice(0, 3)
   }, [coursesRaw])
+
+  const selectedCourse = selectedCourseId
+    ? featuredCourses.find((c) => c.id === selectedCourseId) ??
+      normalizeCoursesSeats(coursesRaw ?? []).find((c) => c.id === selectedCourseId) ??
+      null
+    : null
 
   const subjects = useMemo(() => {
     const items = subjectsRaw?.length ? subjectsRaw : PLACEHOLDER_SUBJECTS
@@ -231,7 +224,7 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch min-h-[380px]">
             {featuredCourses.map((course) => (
-              <CourseCard key={course.id} course={course} onOpen={setSelectedCourse} />
+              <CourseCard key={course.id} course={course} onOpen={(c) => setSelectedCourseId(c.id)} />
             ))}
           </div>
         </div>
@@ -277,7 +270,7 @@ export default function HomePage() {
 
       {selectedCourse && (
         <Suspense fallback={<PageLoader label="Ładowanie…" minHeight="min-h-0" />}>
-          <CourseModal course={selectedCourse} onClose={() => setSelectedCourse(null)} />
+          <CourseModal course={selectedCourse} onClose={() => setSelectedCourseId(null)} />
         </Suspense>
       )}
     </>

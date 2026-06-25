@@ -19,6 +19,24 @@ export function computeSeatsAvailable(seatsLimit: number, confirmedCount: number
   return Math.max(0, seatsLimit - confirmedCount)
 }
 
+/** Ujednolica liczniki miejsc z dokumentu Firestore (bierze niższą wartość wolnych miejsc). */
+export function normalizeCourseSeats(course: Course): Course {
+  const seatsLimit = Number(course.seatsLimit ?? 0)
+  const seatsTaken = Number(course.seatsTaken ?? 0)
+  const fromTaken = computeSeatsAvailable(seatsLimit, seatsTaken)
+  const storedAvailable = Number(course.seatsAvailable ?? fromTaken)
+  const seatsAvailable = Math.min(fromTaken, storedAvailable)
+  let status: CourseStatus = course.status
+  if (status !== 'hidden' && status !== 'finished') {
+    status = seatsAvailable <= 0 ? 'full' : 'active'
+  }
+  return { ...course, seatsLimit, seatsTaken, seatsAvailable, status }
+}
+
+export function normalizeCoursesSeats(courses: Course[]): Course[] {
+  return courses.map(normalizeCourseSeats)
+}
+
 export function enrichCourseWithSeats(course: Course, confirmedCount: number): Course {
   const seatsAvailable = computeSeatsAvailable(course.seatsLimit, confirmedCount)
   const seatsTaken = confirmedCount
@@ -54,11 +72,13 @@ export function formatCoursePrice(price: number, currency: string): string {
 }
 
 export function isCourseBookable(course: Course): boolean {
-  return course.visible && course.seatsAvailable > 0 && course.status !== 'finished' && course.status !== 'hidden'
+  const c = normalizeCourseSeats(course)
+  return c.visible && c.seatsAvailable > 0 && c.status === 'active'
 }
 
 export function availabilityLabel(course: Course): string | null {
-  if (course.seatsAvailable === 0) return 'Brak miejsc'
-  if (course.seatsAvailable <= 2) return 'Ostatnie miejsca'
+  const c = normalizeCourseSeats(course)
+  if (c.seatsAvailable <= 0) return 'Brak miejsc'
+  if (c.seatsAvailable <= 2) return 'Ostatnie miejsca'
   return null
 }

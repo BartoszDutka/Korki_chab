@@ -4,6 +4,7 @@ import {
   formatCoursePrice,
   availabilityLabel,
   isCourseBookable,
+  normalizeCourseSeats,
 } from '../../lib/courseUtils'
 import { COURSE_STATUS_LABELS } from '../../types'
 
@@ -14,8 +15,9 @@ export default function CourseCard({
   course: Course
   onOpen: (course: Course) => void
 }) {
-  const avail = availabilityLabel(course)
-  const bookable = isCourseBookable(course)
+  const courseView = normalizeCourseSeats(course)
+  const avail = availabilityLabel(courseView)
+  const bookable = isCourseBookable(courseView)
 
   return (
     <article
@@ -31,7 +33,7 @@ export default function CourseCard({
           {avail && (
             <span
               className={`text-label-sm font-bold px-3 py-1 rounded-full ${
-                course.seatsAvailable === 0
+                courseView.seatsAvailable <= 0
                   ? 'bg-red-100 text-red-800'
                   : 'bg-amber-100 text-amber-900'
               }`}
@@ -48,7 +50,7 @@ export default function CourseCard({
           <li>{course.location} · {course.level}</li>
           <li>{course.lessonsCount} spotkań · od {new Date(course.startDate).toLocaleDateString('pl-PL')}</li>
           <li>
-            Wolne miejsca: <strong className="text-primary">{course.seatsAvailable}</strong> / {course.seatsLimit}
+            Wolne miejsca: <strong className="text-primary">{courseView.seatsAvailable}</strong> / {courseView.seatsLimit}
           </li>
         </ul>
       </div>
@@ -65,10 +67,14 @@ export default function CourseCard({
 
         <button
           type="button"
-          onClick={() => onOpen(course)}
-          className="w-full bg-secondary-container text-on-secondary font-bold py-3 rounded-lg hover:bg-warm-orange-hover transition-colors min-h-[44px]"
+          onClick={() => onOpen(courseView)}
+          className={`w-full font-bold py-3 rounded-lg transition-colors min-h-[44px] ${
+            bookable
+              ? 'bg-secondary-container text-on-secondary hover:bg-warm-orange-hover'
+              : 'bg-surface-container-low text-on-surface-variant cursor-default'
+          }`}
         >
-          {bookable ? 'Szczegóły i zapisy' : 'Szczegóły'}
+          {bookable ? 'Szczegóły i zapisy' : 'Brak miejsc — szczegóły'}
         </button>
         <Link
           to={`/zajecia/${course.slug}`}

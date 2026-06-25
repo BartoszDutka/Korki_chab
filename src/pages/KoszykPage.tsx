@@ -1,16 +1,50 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useCart } from '../contexts/CartContext'
 import { useAuth } from '../contexts/AuthContext'
-import { formatCoursePrice } from '../lib/courseUtils'
+import { useFirestoreCollection } from '../hooks/useFirestore'
+import { coursesService } from '../services/coursesService'
+import { formatCoursePrice, isCourseBookable, normalizeCourseSeats, normalizeCoursesSeats } from '../lib/courseUtils'
 import EnrollmentForm from '../components/courses/EnrollmentForm'
 import type { SelectedCourse } from '../types'
 
 export default function KoszykPage() {
   const { items, removeCourse, clear, totalPrice, count } = useCart()
   const { user, profile } = useAuth()
+  const { allItems: rawCourses } = useFirestoreCollection(coursesService.subscribe)
   const [showForm, setShowForm] = useState(false)
   const [success, setSuccess] = useState(false)
+
+  const coursesById = useMemo(() => {
+    const map = new Map<string, ReturnType<typeof normalizeCourseSeats>>()
+    for (const course of normalizeCoursesSeats(rawCourses)) {
+      map.set(course.id, course)
+    }
+    return map
+  }, [rawCourses])
+
+  const cartItems = useMemo(
+    () =>
+      items.map((item) => ({
+        item,
+        course: coursesById.get(item.courseId),
+        bookable: coursesById.get(item.courseId) ? isCourseBookable(coursesById.get(item.courseId)!) : false,
+      })),
+    [items, coursesById],
+  )
+
+  const hasUnbookableItems = cartItems.some((entry) => !entry.bookable)
+  const bookableSelectedCourses: SelectedCourse[] = cartItems
+    .filter((entry) => entry.bookable && entry.course)
+    .map((entry) => ({
+      courseId: entry.item.courseId,
+      title: entry.item.title,
+      price: entry.item.price,
+      currency: entry.item.currency,
+      startDate: entry.item.date,
+      startTime: entry.item.time.split('–')[0],
+      endTime: entry.item.time.split('–')[1],
+    }))
 
   if (!user) {
     return (
@@ -25,16 +59,6 @@ export default function KoszykPage() {
       </div>
     )
   }
-
-  const selectedCourses: SelectedCourse[] = items.map((i) => ({
-    courseId: i.courseId,
-    title: i.title,
-    price: i.price,
-    currency: i.currency,
-    startDate: i.date,
-    startTime: i.time.split('–')[0],
-    endTime: i.time.split('–')[1],
-  }))
 
   const currency = items[0]?.currency ?? 'PLN'
 
@@ -66,11 +90,19 @@ export default function KoszykPage() {
       ) : (
         <>
           <ul className="space-y-3">
-            {items.map((item) => (
-              <li key={item.courseId} className="bg-white border rounded-xl p-4 flex flex-wrap justify-between gap-3 items-center">
+            {cartItems.map(({ item, bookable }) => (
+              <li
+                key={item.courseId}
+                className={`bg-white border rounded-xl p-4 flex flex-wrap justify-between gap-3 items-center ${
+                  !bookable ? 'border-red-200 bg-red-50/40' : ''
+                }`}
+              >
                 <div>
                   <p className="font-bold text-primary">{item.title}</p>
                   <p className="text-sm text-on-surface-variant">{item.date} · {item.time}</p>
+                  {!bookable && (
+                    <p className="text-sm font-medium text-red-700 mt-1">Brak wolnych miejsc — usuń z koszyka, aby kontynuować.</p>
+                  )}
                 </div>
                 <div className="flex items-center gap-4">
                   <span className="font-bold text-primary">{formatCoursePrice(item.price, item.currency)}</span>
@@ -93,19 +125,26 @@ export default function KoszykPage() {
               <button
                 type="button"
                 onClick={() => setShowForm(true)}
-                className="bg-secondary-container text-on-secondary font-bold px-6 py-3 rounded-lg"
+                disabled={hasUnbookableItems || bookableSelectedCourses.length === 0}
+                className="bg-secondary-container text-on-secondary font-bold px-6 py-3 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Przejdź do zgłoszenia
               </button>
             )}
           </div>
 
-          {showForm && (
+          {hasUnbookableItems && !showForm && (
+            <p className="text-body-sm text-red-700">
+              Co najmniej jedne zajęcia w koszyku nie mają wolnych miejsc. Usuń je, aby wysłać zgłoszenie.
+            </p>
+          )}
+
+          {showForm && bookableSelectedCourses.length > 0 && (
             <div className="bg-white border rounded-2xl p-6">
               <h2 className="font-bold text-primary text-headline-sm mb-4">Formularz zgłoszenia</h2>
               <EnrollmentForm
                 key={user.uid}
-                courses={selectedCourses}
+                courses={bookableSelectedCourses}
                 userId={user.uid}
                 isGuest={false}
                 userEmail={profile?.email ?? user.email ?? ''}

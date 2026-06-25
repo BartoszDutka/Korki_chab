@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, useMemo, type ReactNode } from 'react'
 import { useAuth } from './AuthContext'
 import type { Course, CartItem } from '../types'
-import { isCourseBookable } from '../lib/courseUtils'
+import { isCourseBookable, normalizeCourseSeats } from '../lib/courseUtils'
 
 interface CartContextValue {
   items: CartItem[]
@@ -51,7 +51,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const addCourse = useCallback(
     async (course: Course): Promise<boolean> => {
       if (!user) return false
-      if (!isCourseBookable(course)) return false
+      if (!isCourseBookable(normalizeCourseSeats(course))) return false
       if (items.some((i) => i.courseId === course.id)) return true
       const newItem: CartItem = {
         courseId: course.id,

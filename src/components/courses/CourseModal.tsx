@@ -1,4 +1,4 @@
-import { useRef, useState, lazy, Suspense } from 'react'
+import { useRef, useState, lazy, Suspense, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Icon from '../icons'
 import type { Course } from '../../types'
@@ -10,6 +10,7 @@ import {
   availabilityLabel,
   isCourseBookable,
   courseToSelectedCourse,
+  normalizeCourseSeats,
 } from '../../lib/courseUtils'
 
 const EnrollmentForm = lazy(() => import('./EnrollmentForm'))
@@ -30,18 +31,29 @@ export default function CourseModal({
   const [cartMsg, setCartMsg] = useState('')
   const [loginMsg, setLoginMsg] = useState('')
 
+  const normalizedCourse = normalizeCourseSeats(course)
+  const bookable = isCourseBookable(normalizedCourse)
+  const avail = availabilityLabel(normalizedCourse)
+
+  useEffect(() => {
+    if (!bookable && view === 'guest-form') {
+      setView('details')
+    }
+  }, [bookable, view])
+  const ongoing =
+    normalizedCourse.status === 'active' || normalizedCourse.status === 'full'
+      ? new Date(normalizedCourse.endDate) >= new Date()
+      : false
+
   useModalAccessibility(true, onClose, dialogRef)
 
   const loggedIn = !!user && !isAdmin
 
-  const bookable = isCourseBookable(course)
-  const avail = availabilityLabel(course)
-  const ongoing =
-    course.status === 'active' || course.status === 'full'
-      ? new Date(course.endDate) >= new Date()
-      : false
-
   const handleAddToCart = async () => {
+    if (!bookable) {
+      setCartMsg('Brak wolnych miejsc na te zajęcia.')
+      return
+    }
     if (!loggedIn) {
       setLoginMsg('Zaloguj się lub zarejestruj, aby dodać zajęcia do koszyka zapisów.')
       return
@@ -50,8 +62,8 @@ export default function CourseModal({
       setCartMsg('Dla tych zajęć dostępny jest zapis bez konta.')
       return
     }
-    const ok = await addCourse(course)
-    if (ok) setCartMsg(hasCourse(course.id) ? 'Zajęcia są już w koszyku.' : 'Dodano do koszyka zapisów.')
+    const ok = await addCourse(normalizedCourse)
+    if (ok) setCartMsg(hasCourse(normalizedCourse.id) ? 'Zajęcia są już w koszyku.' : 'Dodano do koszyka zapisów.')
   }
 
   const handleGoogleLogin = async () => {
@@ -75,7 +87,7 @@ export default function CourseModal({
       >
         <div className="sticky top-0 bg-surface-bright border-b border-outline-variant px-4 py-3 flex justify-between items-center z-10">
           <h2 id="course-modal-title" className="font-bold text-primary text-headline-sm pr-8 line-clamp-2">
-            {course.title}
+            {normalizedCourse.title}
           </h2>
           <button
             type="button"
@@ -100,12 +112,12 @@ export default function CourseModal({
             </div>
           )}
 
-          {view === 'guest-form' && (
+          {view === 'guest-form' && bookable && (
             <div>
               <h3 className="font-bold text-primary mb-4">Zapis bez konta</h3>
               <Suspense fallback={<p className="text-sm text-on-surface-variant">Ładowanie formularza…</p>}>
                 <EnrollmentForm
-                  courses={[courseToSelectedCourse(course)]}
+                  courses={[courseToSelectedCourse(normalizedCourse)]}
                   userId={null}
                   isGuest={true}
                   userEmail=""
@@ -121,7 +133,7 @@ export default function CourseModal({
           {view === 'details' && (
             <>
               <p className="text-body-sm">
-                <Link to={`/zajecia/${course.slug}`} className="text-secondary-container font-medium underline" onClick={onClose}>
+                <Link to={`/zajecia/${normalizedCourse.slug}`} className="text-secondary-container font-medium underline" onClick={onClose}>
                   Otwórz pełną stronę zajęć
                 </Link>
               </p>
@@ -129,7 +141,7 @@ export default function CourseModal({
               {avail && (
                 <div
                   className={`rounded-xl px-4 py-3 font-bold text-center ${
-                    course.seatsAvailable === 0 ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-900'
+                    normalizedCourse.seatsAvailable <= 0 ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-900'
                   }`}
                 >
                   {avail}
@@ -137,36 +149,41 @@ export default function CourseModal({
               )}
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-body-md">
-                <Detail label="Przedmiot" value={course.subject} />
-                <Detail label="Poziom" value={course.level} />
-                <Detail label="Miejsce" value={course.location} />
-                <Detail label="Dzień" value={course.dayOfWeek} />
-                <Detail label="Godziny" value={`${course.startTime} – ${course.endTime}`} />
-                <Detail label="Data rozpoczęcia" value={new Date(course.startDate).toLocaleDateString('pl-PL')} />
-                <Detail label="Data zakończenia" value={new Date(course.endDate).toLocaleDateString('pl-PL')} />
-                <Detail label="Liczba spotkań" value={String(course.lessonsCount)} />
-                <Detail label="Cena" value={formatCoursePrice(course.price, course.currency)} />
-                <Detail label="Limit miejsc" value={String(course.seatsLimit)} />
-                <Detail label="Zajęte miejsca" value={String(course.seatsTaken)} />
-                <Detail label="Wolne miejsca" value={String(course.seatsAvailable)} />
+                <Detail label="Przedmiot" value={normalizedCourse.subject} />
+                <Detail label="Poziom" value={normalizedCourse.level} />
+                <Detail label="Miejsce" value={normalizedCourse.location} />
+                <Detail label="Dzień" value={normalizedCourse.dayOfWeek} />
+                <Detail label="Godziny" value={`${normalizedCourse.startTime} – ${normalizedCourse.endTime}`} />
+                <Detail label="Data rozpoczęcia" value={new Date(normalizedCourse.startDate).toLocaleDateString('pl-PL')} />
+                <Detail label="Data zakończenia" value={new Date(normalizedCourse.endDate).toLocaleDateString('pl-PL')} />
+                <Detail label="Liczba spotkań" value={String(normalizedCourse.lessonsCount)} />
+                <Detail label="Cena" value={formatCoursePrice(normalizedCourse.price, normalizedCourse.currency)} />
+                <Detail label="Limit miejsc" value={String(normalizedCourse.seatsLimit)} />
+                <Detail label="Zajęte miejsca" value={String(normalizedCourse.seatsTaken)} />
+                <Detail label="Wolne miejsca" value={String(normalizedCourse.seatsAvailable)} />
                 <Detail label="Status" value={ongoing ? 'Zajęcia trwają' : 'Zakończone'} />
               </div>
 
               <div>
                 <h3 className="font-bold text-primary mb-2">Opis</h3>
-                <p className="text-body-md text-on-surface-variant whitespace-pre-wrap">{course.fullDescription}</p>
+                <p className="text-body-md text-on-surface-variant whitespace-pre-wrap">{normalizedCourse.fullDescription}</p>
               </div>
 
-              {course.termsUrl && (
+              {normalizedCourse.termsUrl && (
                 <p className="text-body-sm">
-                  <a href={course.termsUrl} target="_blank" rel="noopener noreferrer" className="text-secondary-container font-medium underline">
+                  <a href={normalizedCourse.termsUrl} target="_blank" rel="noopener noreferrer" className="text-secondary-container font-medium underline">
                     Regulamin zajęć
                   </a>
                 </p>
               )}
 
               <div className="space-y-3 pt-4 border-t border-outline-variant">
-                {bookable && course.allowCartEnrollment && (
+                {!bookable && (
+                  <p className="rounded-xl bg-red-100 text-red-800 px-4 py-3 font-bold text-center">
+                    Brak wolnych miejsc — zapis na te zajęcia jest niedostępny.
+                  </p>
+                )}
+                {bookable && normalizedCourse.allowCartEnrollment && (
                   <button
                     type="button"
                     onClick={handleAddToCart}
@@ -181,7 +198,7 @@ export default function CourseModal({
                   <p className="text-body-sm text-amber-800 bg-amber-50 rounded-lg p-3 text-center">{loginMsg}</p>
                 )}
 
-                {!loggedIn && bookable && course.allowGuestEnrollment && (
+                {!loggedIn && bookable && normalizedCourse.allowGuestEnrollment && (
                   <button
                     type="button"
                     onClick={() => setView('guest-form')}
@@ -191,7 +208,7 @@ export default function CourseModal({
                   </button>
                 )}
 
-                {!loggedIn && (
+                {!loggedIn && bookable && (
                   <>
                     <button
                       type="button"
@@ -206,7 +223,7 @@ export default function CourseModal({
                   </>
                 )}
 
-                {loggedIn && (
+                {loggedIn && bookable && (
                   <Link
                     to="/koszyk"
                     className="block text-center text-secondary-container font-medium text-body-sm underline min-h-[44px]"
