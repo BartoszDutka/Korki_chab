@@ -65,7 +65,7 @@ export default function EnrollmentForm({
   onCancel?: () => void
 }) {
   const { profile } = useAuth()
-  const [form, setForm] = useState<EnrollmentFormData>(emptyEnrollmentForm(userEmail, userName))
+  const [form, setForm] = useState<EnrollmentFormData>(() => emptyEnrollmentForm(userEmail, userName))
   const [selectedProfileId, setSelectedProfileId] = useState('')
   const [saveParticipantForFuture, setSaveParticipantForFuture] = useState(false)
   const [submitting, setSubmitting] = useState(false)
@@ -75,10 +75,13 @@ export default function EnrollmentForm({
     userId && profile?.uid === userId ? (profile.participantProfiles ?? []) : []
 
   useEffect(() => {
-    setForm(emptyEnrollmentForm(userEmail, userName))
-    setSelectedProfileId('')
-    setSaveParticipantForFuture(false)
-  }, [userEmail, userName, userId])
+    setForm((f) => ({
+      ...f,
+      email: f.email || userEmail,
+      parentFirstName: f.parentFirstName || userName.split(' ')[0] || '',
+      parentLastName: f.parentLastName || userName.split(' ').slice(1).join(' ') || '',
+    }))
+  }, [userEmail, userName])
 
   const set = (key: keyof EnrollmentFormData, value: string | boolean) =>
     setForm((f) => ({ ...f, [key]: value }))

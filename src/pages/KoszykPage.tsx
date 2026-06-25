@@ -104,6 +104,7 @@ export default function KoszykPage() {
             <div className="bg-white border rounded-2xl p-6">
               <h2 className="font-bold text-primary text-headline-sm mb-4">Formularz zgłoszenia</h2>
               <EnrollmentForm
+                key={user.uid}
                 courses={selectedCourses}
                 userId={user.uid}
                 isGuest={false}

@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react'
+
 const MONTHS = [
   { value: '01', label: 'Styczeń' },
   { value: '02', label: 'Luty' },
@@ -13,7 +15,9 @@ const MONTHS = [
   { value: '12', label: 'Grudzień' },
 ]
 
-function parseIsoDate(value: string): { day: string; month: string; year: string } {
+export type BirthDateParts = { day: string; month: string; year: string }
+
+export function parseIsoDate(value: string): BirthDateParts {
   if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
     return { day: '', month: '', year: '' }
   }
@@ -21,7 +25,7 @@ function parseIsoDate(value: string): { day: string; month: string; year: string
   return { day, month, year }
 }
 
-function buildIsoDate(day: string, month: string, year: string): string {
+export function buildIsoDate(day: string, month: string, year: string): string {
   if (!day || !month || !year) return ''
   return `${year}-${month}-${day}`
 }
@@ -40,10 +44,15 @@ export default function BirthDateInput({
   value: string
   onChange: (isoDate: string) => void
 }) {
-  const { day, month, year } = parseIsoDate(value)
+  const [parts, setParts] = useState<BirthDateParts>(() => parseIsoDate(value))
 
-  const setPart = (part: 'day' | 'month' | 'year', partValue: string) => {
-    const next = { day, month, year, [part]: partValue }
+  useEffect(() => {
+    setParts(parseIsoDate(value))
+  }, [value])
+
+  const setPart = (part: keyof BirthDateParts, partValue: string) => {
+    const next = { ...parts, [part]: partValue }
+    setParts(next)
     onChange(buildIsoDate(next.day, next.month, next.year))
   }
 
@@ -51,7 +60,7 @@ export default function BirthDateInput({
     <div className="grid grid-cols-3 gap-2 mt-1">
       <select
         className={selectClass}
-        value={day}
+        value={parts.day}
         onChange={(e) => setPart('day', e.target.value)}
         aria-label="Dzień urodzenia"
       >
@@ -62,7 +71,7 @@ export default function BirthDateInput({
       </select>
       <select
         className={selectClass}
-        value={month}
+        value={parts.month}
         onChange={(e) => setPart('month', e.target.value)}
         aria-label="Miesiąc urodzenia"
       >
@@ -73,7 +82,7 @@ export default function BirthDateInput({
       </select>
       <select
         className={selectClass}
-        value={year}
+        value={parts.year}
         onChange={(e) => setPart('year', e.target.value)}
         aria-label="Rok urodzenia"
       >
