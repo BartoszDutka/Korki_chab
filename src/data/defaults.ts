@@ -49,6 +49,8 @@ export const DEFAULT_FOOTER: FooterSettings = {
     { label: 'Przedmioty', href: '/przedmioty' },
     { label: 'Cennik', href: '/cennik' },
     { label: 'Aktualności', href: '/aktualnosci' },
+    { label: 'Opinie', href: '/opinie' },
+    { label: 'FAQ', href: '/faq' },
     { label: 'Kontakt', href: '/kontakt' },
   ],
   phone: '+48 123 456 789',
@@ -64,9 +66,6 @@ export const DEFAULT_MENU: MenuItem[] = [
   { id: 'default-przedmioty', label: 'Przedmioty', href: '/przedmioty', order: 2, visible: true },
   { id: 'default-cennik', label: 'Cennik', href: '/cennik', order: 3, visible: true },
   { id: 'default-aktualnosci', label: 'Aktualności', href: '/aktualnosci', order: 4, visible: true },
-  { id: 'default-opinie', label: 'Opinie', href: '/opinie', order: 5, visible: true },
-  { id: 'default-faq', label: 'FAQ', href: '/faq', order: 6, visible: true },
-  { id: 'default-kontakt', label: 'Kontakt', href: '/kontakt', order: 7, visible: true },
 ]
 
 export const DEFAULT_CONTACT: ContactSettings = {

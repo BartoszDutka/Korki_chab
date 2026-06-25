@@ -10,6 +10,8 @@ import { DEFAULT_MENU, DEFAULT_SITE_SETTINGS } from '../data/defaults'
 
 const LOGO_SRC = '/LogoChab.png'
 
+const FOOTER_ONLY_HREFS = ['/opinie', '/faq', '/kontakt']
+
 function SiteLogo({ className = 'h-9 lg:h-11 w-auto max-h-10 lg:max-h-12' }: { className?: string }) {
   return (
     <img
@@ -63,13 +65,12 @@ export default function Header() {
   const { data: menuDeferred, settled: menuSettled } = useDeferredOnce(menuService.getAll)
   const menuItems = useMemo(() => {
     const items = menuDeferred ?? []
-    if (items.length === 0) return DEFAULT_MENU
-    return [...items].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    const sorted = items.length === 0 ? DEFAULT_MENU : [...items].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    return sorted.filter((item) => item.visible !== false && !FOOTER_ONLY_HREFS.includes(item.href))
   }, [menuDeferred])
   const menuLoading = !menuSettled
 
   const siteName = settingsDeferred?.siteName ?? DEFAULT_SITE_SETTINGS.siteName
-  const desktopMenuItems = menuItems.filter((item) => item.href !== '/zajecia')
   const closeMenu = () => setMenuOpen(false)
 
   const handleGoogleLogin = async () => {
@@ -97,7 +98,7 @@ export default function Header() {
 
           <nav className="hidden lg:flex flex-1 justify-center items-center min-w-0 gap-0.5 xl:gap-1 overflow-hidden">
             {!menuLoading &&
-              desktopMenuItems.map((item) => (
+              menuItems.map((item) => (
                 <NavItem key={item.id} href={item.href} label={item.label} compact />
               ))}
           </nav>
@@ -140,19 +141,12 @@ export default function Header() {
                 </Link>
                 <Link
                   to="/zaloguj?mode=register"
-                  className="hidden xl:inline-flex font-medium text-label-md px-3 py-2 rounded-lg text-secondary-container hover:bg-surface-container-low min-h-[44px] items-center font-bold whitespace-nowrap"
+                  className="hidden lg:inline-flex bg-secondary-container text-on-secondary font-medium text-label-sm xl:text-label-md px-3 xl:px-4 py-2 rounded-lg hover:bg-warm-orange-hover transition-colors font-bold shadow-sm min-h-[44px] items-center whitespace-nowrap"
                 >
                   Zarejestruj się
                 </Link>
               </>
             ) : null}
-
-            <Link
-              to="/zajecia"
-              className="hidden lg:inline-flex bg-secondary-container text-on-secondary font-medium text-label-sm xl:text-label-md px-3 xl:px-4 py-2 rounded-lg hover:bg-warm-orange-hover transition-colors font-bold shadow-sm whitespace-nowrap"
-            >
-              Zajęcia
-            </Link>
 
             <button
               type="button"
@@ -195,13 +189,7 @@ export default function Header() {
           {menuItems.map((item) => (
             <NavItem key={item.id} href={item.href} label={item.label} onNavigate={closeMenu} />
           ))}
-          <Link
-            to="/zajecia"
-            className="mt-2 font-medium px-3 py-2 text-secondary-container font-bold min-h-[44px] flex items-center"
-            onClick={closeMenu}
-          >
-            Dostępne zajęcia
-          </Link>
+          <div className="mt-auto pt-4 border-t border-outline-variant flex flex-col gap-1">
           {user && !isAdmin ? (
             <>
               <Link to="/koszyk" className="font-medium px-3 py-2 text-primary min-h-[44px] flex items-center" onClick={closeMenu}>
@@ -228,7 +216,7 @@ export default function Header() {
               </Link>
               <Link
                 to="/zaloguj?mode=register"
-                className="font-medium px-3 py-2 text-secondary-container font-bold min-h-[44px] flex items-center"
+                className="font-medium px-3 py-2 bg-secondary-container text-on-secondary font-bold rounded-lg min-h-[44px] flex items-center justify-center"
                 onClick={closeMenu}
               >
                 Zarejestruj się
@@ -245,6 +233,7 @@ export default function Header() {
               </button>
             </>
           ) : null}
+          </div>
         </div>
       </nav>
     </>

@@ -77,12 +77,10 @@ export async function seedInitialData(firestore: Firestore = defaultDb): Promise
 
   const menuItems: Omit<MenuItem, 'id'>[] = [
     { label: 'Start', href: '/', order: 0, visible: true },
-    { label: 'Przedmioty', href: '/przedmioty', order: 1, visible: true },
-    { label: 'Cennik', href: '/cennik', order: 2, visible: true },
-    { label: 'Aktualności', href: '/aktualnosci', order: 3, visible: true },
-    { label: 'Opinie', href: '/opinie', order: 4, visible: true },
-    { label: 'FAQ', href: '/faq', order: 5, visible: true },
-    { label: 'Kontakt', href: '/kontakt', order: 6, visible: true },
+    { label: 'Zajęcia', href: '/zajecia', order: 1, visible: true },
+    { label: 'Przedmioty', href: '/przedmioty', order: 2, visible: true },
+    { label: 'Cennik', href: '/cennik', order: 3, visible: true },
+    { label: 'Aktualności', href: '/aktualnosci', order: 4, visible: true },
   ]
 
   for (const item of menuItems) {
@@ -202,7 +200,7 @@ export async function seedInitialData(firestore: Firestore = defaultDb): Promise
       { id: 'phone', name: 'phone', label: 'Telefon', type: 'tel', placeholder: '+48 ___ ___ ___', required: true, visible: true },
       { id: 'email', name: 'email', label: 'E-mail', type: 'email', placeholder: 'twoj@email.pl', required: true, visible: true },
       { id: 'grade', name: 'grade', label: 'Klasa ucznia', type: 'text', placeholder: 'np. 8 SP', required: false, visible: true },
-      { id: 'subject', name: 'subject', label: 'Wybrany przedmiot', type: 'select', placeholder: '', required: false, visible: true, options: ['Matematyka', 'Polski', 'Angielski', 'Inny'] },
+      { id: 'subject', name: 'subject', label: 'Wybrany przedmiot', type: 'select', placeholder: '', required: false, visible: true, options: ['Matematyka', 'Język polski', 'Język angielski', 'Inny'] },
       { id: 'goal', name: 'goal', label: 'Cel zajęć', type: 'text', placeholder: 'np. matura, poprawa ocen', required: false, visible: true },
       { id: 'format', name: 'format', label: 'Preferowana forma', type: 'select', placeholder: '', required: false, visible: true, options: ['Indywidualne', 'Para', 'Grupa', 'Online'] },
       { id: 'schedule', name: 'schedule', label: 'Preferowane dni i godziny', type: 'text', placeholder: 'np. wtorki 17:00', required: false, visible: true },
@@ -222,6 +220,8 @@ export async function seedInitialData(firestore: Firestore = defaultDb): Promise
       { label: 'Przedmioty', href: '/przedmioty' },
       { label: 'Cennik', href: '/cennik' },
       { label: 'Aktualności', href: '/aktualnosci' },
+      { label: 'Opinie', href: '/opinie' },
+      { label: 'FAQ', href: '/faq' },
       { label: 'Kontakt', href: '/kontakt' },
     ],
     phone: '+48 123 456 789',

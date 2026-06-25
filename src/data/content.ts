@@ -40,14 +40,14 @@ export const SUBJECTS: Subject[] = [
   },
   {
     id: 'angielski',
-    name: 'Język Angielski',
+    name: 'Język angielski',
     icon: 'language',
     description: 'Konwersacje, gramatyka oraz przygotowanie do certyfikatów językowych i matury.',
     shortDescription: 'Konwersacje, gramatyka, certyfikaty.',
   },
   {
     id: 'polski',
-    name: 'Język Polski',
+    name: 'Język polski',
     icon: 'menu_book',
     description: 'Analiza lektur, pisanie wypracowań i przygotowanie do egzaminów końcowych.',
     shortDescription: 'Pisanie wypracowań, analiza lektur.',

@@ -78,7 +78,7 @@ export default function ZajeciaPage() {
               Brak zajęć spełniających kryteria. Sprawdź filtry lub wróć później.
             </p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
               {filtered.map((course) => (
                 <CourseCard key={course.id} course={course} onOpen={setSelected} />
               ))}
