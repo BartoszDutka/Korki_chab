@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Manrope", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-sans: "Manrope Variable", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
   --color-warm-orange-hover: #e68a00;
   --color-surface-container-lowest: #ffffff;
