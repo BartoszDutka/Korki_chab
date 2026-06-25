@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import Icon from '../icons'
 import type { Course } from '../../types'
@@ -11,7 +11,8 @@ import {
   isCourseBookable,
   courseToSelectedCourse,
 } from '../../lib/courseUtils'
-import EnrollmentForm from './EnrollmentForm'
+
+const EnrollmentForm = lazy(() => import('./EnrollmentForm'))
 
 type ModalView = 'details' | 'guest-form' | 'success'
 
@@ -102,16 +103,18 @@ export default function CourseModal({
           {view === 'guest-form' && (
             <div>
               <h3 className="font-bold text-primary mb-4">Zapis bez konta</h3>
-              <EnrollmentForm
-                courses={[courseToSelectedCourse(course)]}
-                userId={null}
-                isGuest={true}
-                userEmail=""
-                userName=""
-                messageType="enrollment"
-                onSuccess={() => setView('success')}
-                onCancel={() => setView('details')}
-              />
+              <Suspense fallback={<p className="text-sm text-on-surface-variant">Ładowanie formularza…</p>}>
+                <EnrollmentForm
+                  courses={[courseToSelectedCourse(course)]}
+                  userId={null}
+                  isGuest={true}
+                  userEmail=""
+                  userName=""
+                  messageType="enrollment"
+                  onSuccess={() => setView('success')}
+                  onCancel={() => setView('details')}
+                />
+              </Suspense>
             </div>
           )}
 

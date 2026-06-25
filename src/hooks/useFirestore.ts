@@ -41,3 +41,61 @@ export function useFirestoreDoc<T>(
 
   return { data, loading }
 }
+
+/** Jednorazowy odczyt — mniej obciąża Firestore i nie powoduje ciągłych re-renderów. */
+export function useFirestoreCollectionOnce<T extends { id: string; order?: number }>(
+  fetchAll: () => Promise<T[]>,
+  visibleOnly = false,
+) {
+  const [items, setItems] = useState<T[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+    fetchAll()
+      .then((data) => {
+        if (!cancelled) {
+          setItems(data)
+          setLoading(false)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [fetchAll])
+
+  const sorted = [...items].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+  const visible = visibleOnly
+    ? sorted.filter((item) => (item as T & { visible?: boolean }).visible !== false)
+    : sorted
+
+  return { items: visible, allItems: sorted, loading }
+}
+
+/** Jednorazowy odczyt dokumentu — dla statycznych danych layoutu (menu, stopka). */
+export function useFirestoreDocOnce<T>(fetch: () => Promise<T | null>) {
+  const [data, setData] = useState<T | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    let cancelled = false
+    fetch()
+      .then((d) => {
+        if (!cancelled) {
+          setData(d)
+          setLoading(false)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [fetch])
+
+  return { data, loading }
+}

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useCart } from '../contexts/CartContext'
 import Icon from './ui'
-import { useFirestoreCollection, useFirestoreDoc } from '../hooks/useFirestore'
+import { useFirestoreDocOnce, useFirestoreCollectionOnce } from '../hooks/useFirestore'
 import { menuService } from '../services/menuService'
 import { settingsService } from '../services/settingsService'
 import { DEFAULT_MENU } from '../data/defaults'
@@ -59,8 +59,8 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const { user, isAdmin, logout, signInWithGoogle } = useAuth()
   const { count } = useCart()
-  const { data: settings } = useFirestoreDoc(settingsService.subscribe)
-  const { items: menuFromDb, loading: menuLoading } = useFirestoreCollection(menuService.subscribe, true)
+  const { data: settings } = useFirestoreDocOnce(settingsService.get)
+  const { items: menuFromDb, loading: menuLoading } = useFirestoreCollectionOnce(menuService.getAll, true)
   const menuItems = menuFromDb.length > 0 ? menuFromDb : DEFAULT_MENU
 
   const siteName = settings?.siteName ?? 'Centrum Chabówka'

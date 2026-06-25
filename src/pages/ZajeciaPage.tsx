@@ -1,13 +1,14 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, lazy, Suspense } from 'react'
 import { useFirestoreCollection } from '../hooks/useFirestore'
 import { coursesService } from '../services/coursesService'
 import { computeSeatsAvailable } from '../lib/courseUtils'
 import CourseCard from '../components/courses/CourseCard'
-import CourseModal from '../components/courses/CourseModal'
 import CourseFilters, { defaultCourseFilters, filterCourses } from '../components/courses/CourseFilters'
 import type { Course } from '../types'
 import { useSeo } from '../hooks/useSeo'
 import PageLoader from '../components/PageLoader'
+
+const CourseModal = lazy(() => import('../components/courses/CourseModal'))
 
 function withComputedSeats(courses: Course[]): Course[] {
   return courses.map((c) => ({
@@ -86,7 +87,11 @@ export default function ZajeciaPage() {
         </div>
       </section>
 
-      {selected && <CourseModal course={selected} onClose={() => setSelected(null)} />}
+      {selected && (
+        <Suspense fallback={<PageLoader label="Ładowanie…" />}>
+          <CourseModal course={selected} onClose={() => setSelected(null)} />
+        </Suspense>
+      )}
     </>
   )
 }

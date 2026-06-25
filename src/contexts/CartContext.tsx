@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, useCallback, useMemo, type ReactNode } from 'react'
 import { useAuth } from './AuthContext'
 import type { Course, CartItem } from '../types'
 import { cartsService } from '../services/cartsService'
@@ -44,48 +44,57 @@ export function CartProvider({ children }: { children: ReactNode }) {
     [user],
   )
 
-  const addCourse = async (course: Course): Promise<boolean> => {
-    if (!user) return false
-    if (!isCourseBookable(course)) return false
-    if (items.some((i) => i.courseId === course.id)) return true
-    const newItem: CartItem = {
-      courseId: course.id,
-      title: course.title,
-      date: course.startDate,
-      time: `${course.startTime}–${course.endTime}`,
-      price: course.price,
-      currency: course.currency,
-      addedAt: new Date().toISOString(),
-    }
-    await persist([...items, newItem])
-    return true
-  }
+  const addCourse = useCallback(
+    async (course: Course): Promise<boolean> => {
+      if (!user) return false
+      if (!isCourseBookable(course)) return false
+      if (items.some((i) => i.courseId === course.id)) return true
+      const newItem: CartItem = {
+        courseId: course.id,
+        title: course.title,
+        date: course.startDate,
+        time: `${course.startTime}–${course.endTime}`,
+        price: course.price,
+        currency: course.currency,
+        addedAt: new Date().toISOString(),
+      }
+      await persist([...items, newItem])
+      return true
+    },
+    [user, items, persist],
+  )
 
-  const removeCourse = async (courseId: string) => {
-    await persist(items.filter((i) => i.courseId !== courseId))
-  }
+  const removeCourse = useCallback(
+    async (courseId: string) => {
+      await persist(items.filter((i) => i.courseId !== courseId))
+    },
+    [items, persist],
+  )
 
-  const clear = async () => {
+  const clear = useCallback(async () => {
     if (!user) return
     await cartsService.clear(user.uid)
     setItems([])
-  }
+  }, [user])
 
   const totalPrice = items.reduce((sum, i) => sum + i.price, 0)
 
+  const value = useMemo(
+    () => ({
+      items,
+      loading,
+      count: items.length,
+      totalPrice,
+      addCourse,
+      removeCourse,
+      clear,
+      hasCourse: (id: string) => items.some((i) => i.courseId === id),
+    }),
+    [items, loading, totalPrice, addCourse, removeCourse, clear],
+  )
+
   return (
-    <CartContext.Provider
-      value={{
-        items,
-        loading,
-        count: items.length,
-        totalPrice,
-        addCourse,
-        removeCourse,
-        clear,
-        hasCourse: (id) => items.some((i) => i.courseId === id),
-      }}
-    >
+    <CartContext.Provider value={value}>
       {children}
     </CartContext.Provider>
   )

@@ -4,7 +4,7 @@ import Icon, { Button } from '../components/ui'
 import EditableText from '../components/live-edit/EditableText'
 import OptimizedImage from '../components/OptimizedImage'
 import PageLoader from '../components/PageLoader'
-import { useFirestoreDoc, useFirestoreCollection } from '../hooks/useFirestore'
+import { useFirestoreDocOnce, useFirestoreCollectionOnce } from '../hooks/useFirestore'
 import { useSeo } from '../hooks/useSeo'
 import { SITE_URL } from '../lib/seo'
 import { settingsService } from '../services/settingsService'
@@ -16,10 +16,10 @@ import { IMAGES } from '../data/content'
 import DataSetupBanner from '../components/DataSetupBanner'
 
 export default function HomePage() {
-  const { data: settingsRaw, loading: settingsLoading } = useFirestoreDoc(settingsService.subscribe)
-  const { data: seoRaw } = useFirestoreDoc(seoService.subscribe)
-  const { allItems: posts } = useFirestoreCollection(postsService.subscribe)
-  const { items: subjects } = useFirestoreCollection(subjectsService.subscribe, true)
+  const { data: settingsRaw, loading: settingsLoading } = useFirestoreDocOnce(settingsService.get)
+  const { data: seoRaw } = useFirestoreDocOnce(seoService.get)
+  const { allItems: posts } = useFirestoreCollectionOnce(postsService.getAll)
+  const { items: subjects } = useFirestoreCollectionOnce(subjectsService.getAll, true)
 
   const settings = settingsRaw ?? DEFAULT_SITE_SETTINGS
   const seo = seoRaw

@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, useMemo, useCallback, type ReactNode } from 'react'
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
@@ -50,11 +50,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
-  const login = async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string) => {
     await signInWithEmailAndPassword(auth, email, password)
-  }
+  }, [])
 
-  const register = async (email: string, password: string, displayName?: string) => {
+  const register = useCallback(async (email: string, password: string, displayName?: string) => {
     const cred = await createUserWithEmailAndPassword(auth, email, password)
     if (displayName?.trim()) {
       await updateProfile(cred.user, { displayName: displayName.trim() })
@@ -63,24 +63,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       displayName: displayName?.trim() || email,
       email,
     })
-  }
+  }, [])
 
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = useCallback(async () => {
     const provider = new GoogleAuthProvider()
     await signInWithPopup(auth, provider)
-  }
+  }, [])
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     await signOut(auth)
-  }
+  }, [])
 
   const isAdmin = profile?.role === 'admin' || isAdminEmail(user?.email)
   const isUser = !!user && profile?.role === 'user'
 
+  const value = useMemo(
+    () => ({
+      user,
+      profile,
+      loading,
+      login,
+      register,
+      signInWithGoogle,
+      logout,
+      isAdmin,
+      isUser,
+    }),
+    [user, profile, loading, login, register, signInWithGoogle, logout, isAdmin, isUser],
+  )
+
   return (
-    <AuthContext.Provider
-      value={{ user, profile, loading, login, register, signInWithGoogle, logout, isAdmin, isUser }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   )

@@ -1,19 +1,11 @@
 import { Link } from 'react-router-dom'
-import { useFirestoreDoc } from '../hooks/useFirestore'
+import { useFirestoreDocOnce } from '../hooks/useFirestore'
 import { footerService } from '../services/footerService'
 import { DEFAULT_FOOTER } from '../data/defaults'
 
 export default function Footer() {
-  const { data: footerRaw, loading } = useFirestoreDoc(footerService.subscribe)
+  const { data: footerRaw } = useFirestoreDocOnce(footerService.get)
   const footer = footerRaw ?? DEFAULT_FOOTER
-
-  if (loading && !footerRaw) {
-    return (
-      <footer className="bg-academic-navy-deep w-full py-12 text-center text-surface-container-high/60 text-sm">
-        Ładowanie stopki...
-      </footer>
-    )
-  }
 
   return (
     <footer className="bg-academic-navy-deep w-full py-12 md:py-section-gap">

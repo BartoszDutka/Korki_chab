@@ -1,7 +1,7 @@
 import { initializeApp, getApps, getApp } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
-import { getStorage } from 'firebase/storage'
+import { getStorage, type FirebaseStorage } from 'firebase/storage'
 import { getAnalytics, isSupported, type Analytics } from 'firebase/analytics'
 
 function env(key: string): string {
@@ -25,7 +25,15 @@ export const app = getApps().length ? getApp() : initializeApp(firebaseConfig)
 
 export const db = getFirestore(app)
 export const auth = getAuth(app)
-export const storage = getStorage(app)
+
+let storageInstance: FirebaseStorage | null = null
+
+export function getFirebaseStorage(): FirebaseStorage {
+  if (!storageInstance) {
+    storageInstance = getStorage(app)
+  }
+  return storageInstance
+}
 
 let analyticsInstance: Analytics | null = null
 
