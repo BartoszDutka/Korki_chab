@@ -6,18 +6,20 @@ import Icon from './ui'
 import { useDeferredOnce } from '../hooks/useDeferredOnce'
 import { DEFAULT_MENU, DEFAULT_SITE_SETTINGS } from '../data/defaults'
 
-const LOGO_SRC = '/LogoChab.svg'
+const LOGO_SRC = '/LogoChab.png'
+const LOGO_WIDTH = 1254
+const LOGO_HEIGHT = 1254
 
 const FOOTER_ONLY_HREFS = ['/opinie', '/faq', '/kontakt']
 
-function SiteLogo({ className = 'h-9 lg:h-11 w-9 lg:w-11' }: { className?: string }) {
+function SiteLogo({ className = 'h-10 lg:h-12 w-10 lg:w-12' }: { className?: string }) {
   return (
     <img
       src={LOGO_SRC}
-      alt=""
+      alt="Korepetycje w Chabówce — logo"
       className={`shrink-0 object-contain ${className}`}
-      width={44}
-      height={44}
+      width={LOGO_WIDTH}
+      height={LOGO_HEIGHT}
       fetchPriority="high"
       decoding="async"
     />
@@ -68,19 +70,26 @@ export default function Header() {
     [],
   )
   const { data: settingsDeferred } = useDeferredOnce(fetchSettings, { delayMs: 2000 })
-  const { data: menuDeferred, settled: menuSettled } = useDeferredOnce(fetchMenu, { delayMs: 2000 })
+  const { data: menuDeferred } = useDeferredOnce(fetchMenu, { delayMs: 2000 })
   const menuItems = useMemo(() => {
     const items = menuDeferred ?? []
-    const sorted = items.length === 0 ? DEFAULT_MENU : [...items].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-    return sorted.filter((item) => item.visible !== false && !FOOTER_ONLY_HREFS.includes(item.href))
-  }, [menuDeferred])
-  const menuLoading = !menuSettled
-  const navItems = useMemo(() => {
-    if (menuLoading) {
-      return DEFAULT_MENU.filter((item) => item.visible !== false && !FOOTER_ONLY_HREFS.includes(item.href))
+    const sorted =
+      items.length === 0
+        ? DEFAULT_MENU
+        : [...items].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    const filtered = sorted.filter(
+      (item) => item.visible !== false && !FOOTER_ONLY_HREFS.includes(item.href),
+    )
+    const hrefs = new Set(filtered.map((item) => item.href))
+    const merged = [...filtered]
+    for (const fallback of DEFAULT_MENU) {
+      if (!hrefs.has(fallback.href) && !FOOTER_ONLY_HREFS.includes(fallback.href)) {
+        merged.push(fallback)
+      }
     }
-    return menuItems
-  }, [menuLoading, menuItems])
+    return merged.sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+  }, [menuDeferred])
+  const navItems = menuItems
 
   const siteName = settingsDeferred?.siteName ?? DEFAULT_SITE_SETTINGS.siteName
   const closeMenu = () => setMenuOpen(false)

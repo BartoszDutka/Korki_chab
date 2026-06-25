@@ -81,4 +81,16 @@ export const coursesService = {
   add: (item: Omit<Course, 'id'>) => addCollectionItem(COL, item),
   update: (id: string, data: Partial<Course>) => updateCollectionItem(COL, id, data),
   delete: (id: string) => deleteCollectionItem(COL, id),
+  getPublished: async (): Promise<Course[]> => {
+    const all = await getCollection<Course>(COL)
+    return sortByOrder(
+      all.filter(
+        (c) =>
+          c.visible !== false &&
+          c.status !== 'hidden' &&
+          c.status !== 'finished' &&
+          (c.status === 'active' || c.status === 'full'),
+      ),
+    )
+  },
 }

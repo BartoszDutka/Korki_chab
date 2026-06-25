@@ -1,16 +1,32 @@
-import { useMemo, useCallback } from 'react'
+import { useMemo, useCallback, useState, lazy, Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import Icon, { Button } from '../components/ui'
 import ConditionalEditable from '../components/ConditionalEditable'
 import ImageWithAspectRatio from '../components/ImageWithAspectRatio'
+import CourseCard from '../components/courses/CourseCard'
+import PageLoader from '../components/PageLoader'
 import { useDeferredOnce } from '../hooks/useDeferredOnce'
 import { useSeo } from '../hooks/useSeo'
 import { SITE_URL } from '../lib/seo'
+import { computeSeatsAvailable } from '../lib/courseUtils'
 import { DEFAULT_SITE_SETTINGS } from '../data/defaults'
 import { IMAGES, SUBJECTS } from '../data/content'
 import DataSetupBanner from '../components/DataSetupBanner'
-import { GridSkeleton, PostCardSkeleton } from '../components/skeletons'
-import type { Subject } from '../types'
+import { SAMPLE_POSTS } from '../lib/seedPosts'
+import { SAMPLE_COURSES } from '../lib/seedCourses'
+import type { Course, Post, Subject } from '../types'
+
+const CourseModal = lazy(() => import('../components/courses/CourseModal'))
+
+const FALLBACK_POSTS: Post[] = SAMPLE_POSTS.map((post, index) => ({
+  ...post,
+  id: `fallback-post-${index}`,
+}))
+
+const FALLBACK_COURSES: Course[] = SAMPLE_COURSES.map((course, index) => ({
+  ...course,
+  id: `fallback-course-${index}`,
+}))
 
 const PLACEHOLDER_SUBJECTS: Subject[] = SUBJECTS.map((s, order) => ({
   id: s.id,
@@ -21,7 +37,22 @@ const PLACEHOLDER_SUBJECTS: Subject[] = SUBJECTS.map((s, order) => ({
   visible: true,
 }))
 
+function withComputedSeats(courses: Course[]): Course[] {
+  return courses.map((c) => ({
+    ...c,
+    seatsAvailable: computeSeatsAvailable(c.seatsLimit, c.seatsTaken),
+    status:
+      c.status !== 'hidden' && c.status !== 'finished' && computeSeatsAvailable(c.seatsLimit, c.seatsTaken) === 0
+        ? 'full'
+        : c.status === 'full' && computeSeatsAvailable(c.seatsLimit, c.seatsTaken) > 0
+          ? 'active'
+          : c.status,
+  }))
+}
+
 export default function HomePage() {
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null)
+
   const fetchSettings = useCallback(
     () => import('../services/settingsService').then((m) => m.settingsService.get()),
     [],
@@ -31,30 +62,39 @@ export default function HomePage() {
     [],
   )
   const fetchPosts = useCallback(
-    () => import('../services/postsService').then((m) => m.postsService.getAll()),
+    () => import('../services/postsService').then((m) => m.postsService.getPublished()),
     [],
   )
   const fetchSubjects = useCallback(
     () => import('../services/subjectsService').then((m) => m.subjectsService.getAll()),
     [],
   )
+  const fetchCourses = useCallback(
+    () => import('../services/coursesService').then((m) => m.coursesService.getPublished()),
+    [],
+  )
 
   const { data: settingsRaw, settled: settingsSettled } = useDeferredOnce(fetchSettings, { delayMs: 1500 })
   const { data: seoRaw } = useDeferredOnce(fetchSeo, { delayMs: 3500 })
-  const { data: postsRaw, settled: postsSettled } = useDeferredOnce(fetchPosts, { delayMs: 3000 })
+  const { data: postsRaw } = useDeferredOnce(fetchPosts, { delayMs: 800 })
   const { data: subjectsRaw } = useDeferredOnce(fetchSubjects, { delayMs: 2500 })
+  const { data: coursesRaw } = useDeferredOnce(fetchCourses, { delayMs: 1000 })
 
   const settings = settingsRaw ?? DEFAULT_SITE_SETTINGS
   const seo = seoRaw
   const usingDefaults = settingsSettled && !settingsRaw
 
-  const publishedPosts = useMemo(
-    () =>
-      (postsRaw ?? [])
-        .filter((p) => p.status === 'published')
-        .slice(0, 3),
-    [postsRaw],
-  )
+  const publishedPosts = useMemo(() => {
+    const fromFirestore = postsRaw ?? []
+    const source = fromFirestore.length > 0 ? fromFirestore : FALLBACK_POSTS
+    return source.slice(0, 3)
+  }, [postsRaw])
+
+  const featuredCourses = useMemo(() => {
+    const fromFirestore = coursesRaw?.length ? withComputedSeats(coursesRaw) : []
+    const source = fromFirestore.length > 0 ? fromFirestore : withComputedSeats(FALLBACK_COURSES)
+    return source.slice(0, 3)
+  }, [coursesRaw])
 
   const subjects = useMemo(() => {
     const items = subjectsRaw?.length ? subjectsRaw : PLACEHOLDER_SUBJECTS
@@ -62,7 +102,6 @@ export default function HomePage() {
   }, [subjectsRaw])
 
   const showPostsSection = settings.sectionVisibility.posts
-  const postsReady = postsSettled && publishedPosts.length > 0
   const showAboutSection =
     (settingsSettled ? settings.aboutVisible : DEFAULT_SITE_SETTINGS.aboutVisible) &&
     settings.sectionVisibility.about
@@ -179,30 +218,38 @@ export default function HomePage() {
         </section>
       )}
 
+      <section className="py-section-gap px-margin-mobile md:px-margin-desktop bg-surface-container-lowest min-h-[520px]">
+        <div className="max-w-container-max mx-auto">
+          <div className="flex justify-between items-end mb-10 gap-4 min-h-[40px]">
+            <h2 className="text-headline-lg-mobile md:text-headline-lg font-bold text-primary">Oferta zajęć</h2>
+            <Link to="/zajecia" className="text-primary font-medium text-label-md flex items-center gap-2 shrink-0">
+              Wszystkie zajęcia <Icon name="arrow_forward" className="text-sm" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch min-h-[380px]">
+            {featuredCourses.map((course) => (
+              <CourseCard key={course.id} course={course} onOpen={setSelectedCourse} />
+            ))}
+          </div>
+        </div>
+      </section>
+
       {showPostsSection && (
-        <section className="py-section-gap px-margin-mobile md:px-margin-desktop bg-surface-container-lowest min-h-[380px]">
+        <section className="py-section-gap px-margin-mobile md:px-margin-desktop bg-surface-bright min-h-[380px]">
           <div className="max-w-container-max mx-auto">
             <div className="flex justify-between items-end mb-10 gap-4 min-h-[40px]">
               <h2 className="text-headline-lg-mobile md:text-headline-lg font-bold text-primary">Aktualności</h2>
               <Link to="/aktualnosci" className="text-primary font-medium text-label-md shrink-0">Wszystkie aktualności</Link>
             </div>
-            {!postsSettled ? (
-              <GridSkeleton count={3} columns="grid-cols-1 md:grid-cols-3">
-                <PostCardSkeleton />
-              </GridSkeleton>
-            ) : postsReady ? (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {publishedPosts.map((post) => (
-                  <Link key={post.id} to={`/aktualnosci/${post.slug}`} className="bg-surface-bright border rounded-xl p-6 card-hover block min-h-[180px]">
-                    <p className="text-label-sm text-on-surface-variant mb-2">{new Date(post.publishedAt).toLocaleDateString('pl')}</p>
-                    <h3 className="font-bold text-primary mb-2">{post.title}</h3>
-                    <p className="text-body-md text-on-surface-variant text-sm line-clamp-3">{post.excerpt}</p>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <div className="min-h-[180px]" aria-hidden="true" />
-            )}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 min-h-[180px]">
+              {publishedPosts.map((post) => (
+                <Link key={post.id} to={`/aktualnosci/${post.slug}`} className="bg-surface-bright border rounded-xl p-6 card-hover block min-h-[180px]">
+                  <p className="text-label-sm text-on-surface-variant mb-2">{new Date(post.publishedAt).toLocaleDateString('pl')}</p>
+                  <h3 className="font-bold text-primary mb-2">{post.title}</h3>
+                  <p className="text-body-md text-on-surface-variant text-sm line-clamp-3">{post.excerpt}</p>
+                </Link>
+              ))}
+            </div>
           </div>
         </section>
       )}
@@ -223,6 +270,12 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+      )}
+
+      {selectedCourse && (
+        <Suspense fallback={<PageLoader label="Ładowanie…" minHeight="min-h-0" />}>
+          <CourseModal course={selectedCourse} onClose={() => setSelectedCourse(null)} />
+        </Suspense>
       )}
     </>
   )

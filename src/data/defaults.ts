@@ -46,6 +46,7 @@ export const DEFAULT_FOOTER: FooterSettings = {
   footerTitle: 'Centrum Chabówka',
   footerDescription: 'Twoje lokalne centrum wsparcia edukacyjnego w Chabówce i okolicach.',
   links: [
+    { label: 'Zajęcia', href: '/zajecia' },
     { label: 'Przedmioty', href: '/przedmioty' },
     { label: 'Cennik', href: '/cennik' },
     { label: 'Aktualności', href: '/aktualnosci' },
