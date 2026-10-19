@@ -8,7 +8,7 @@ function env(key: string): string {
   if (typeof import.meta !== 'undefined' && import.meta.env?.[key]) {
     return import.meta.env[key] as string
   }
-  return process.env[key] ?? ''
+  return typeof process !== 'undefined' ? process.env[key] ?? '' : ''
 }
 
 const firebaseConfig = {

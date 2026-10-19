@@ -11,6 +11,13 @@ build/
 .env
 .env.*
 !.env.example
+*.service-account.json
+service-account*.json
+firebase-adminsdk*.json
+*.pem
+*.key
+*.p12
+*.pfx
 
 # Logs
 logs/

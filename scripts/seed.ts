@@ -18,8 +18,13 @@ function loadEnvFile() {
   }
 }
 
-const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL ?? 'admin@centrumchabowka.pl'
-const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD ?? 'Chabowka2026!'
+function requiredEnv(name: string): string {
+  const value = process.env[name]
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}. Add it to your local .env file.`)
+  }
+  return value
+}
 
 function printRulesHint() {
   console.error(
@@ -34,18 +39,20 @@ async function ensureAdminAuth(
   signIn: typeof import('firebase/auth').signInWithEmailAndPassword,
   createUser: typeof import('firebase/auth').createUserWithEmailAndPassword,
   auth: import('firebase/auth').Auth,
+  adminEmail: string,
+  adminPassword: string,
 ) {
   console.log('Logowanie do Firebase...')
   try {
-    await signIn(auth, ADMIN_EMAIL, ADMIN_PASSWORD)
+    await signIn(auth, adminEmail, adminPassword)
     console.log('Zalogowano jako administrator.')
   } catch {
     try {
-      await createUser(auth, ADMIN_EMAIL, ADMIN_PASSWORD)
+      await createUser(auth, adminEmail, adminPassword)
       console.log('Utworzono konto administratora.')
     } catch (error) {
       throw new Error(
-        `Nie można zalogować ani utworzyć admina (${ADMIN_EMAIL}). Włącz Email/Password w Firebase Authentication.`,
+        `Nie można zalogować ani utworzyć admina (${adminEmail}). Włącz Email/Password w Firebase Authentication.`,
         { cause: error },
       )
     }
@@ -54,12 +61,14 @@ async function ensureAdminAuth(
 
 async function main() {
   loadEnvFile()
+  const adminEmail = requiredEnv('SEED_ADMIN_EMAIL')
+  const adminPassword = requiredEnv('SEED_ADMIN_PASSWORD')
 
   const { createUserWithEmailAndPassword, signInWithEmailAndPassword } = await import('firebase/auth')
   const { auth, db } = await import('../src/lib/firebase')
   const { seedInitialData, isDatabaseEmpty } = await import('../src/lib/seedData')
 
-  await ensureAdminAuth(signInWithEmailAndPassword, createUserWithEmailAndPassword, auth)
+  await ensureAdminAuth(signInWithEmailAndPassword, createUserWithEmailAndPassword, auth, adminEmail, adminPassword)
 
   let empty = false
   try {
@@ -92,8 +101,7 @@ async function main() {
     if (created) {
       console.log('✓ Dane przykładowe zostały utworzone w Firestore.')
       console.log(`  Panel admin: /admin/login`)
-      console.log(`  E-mail: ${ADMIN_EMAIL}`)
-      console.log(`  Hasło: ${ADMIN_PASSWORD}`)
+      console.log(`  E-mail: ${adminEmail}`)
     } else {
       console.log('Seed nie utworzył danych (baza nie była pusta).')
     }

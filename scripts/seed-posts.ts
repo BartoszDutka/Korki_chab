@@ -18,20 +18,27 @@ function loadEnvFile() {
   }
 }
 
-const ADMIN_EMAIL = process.env.SEED_ADMIN_EMAIL ?? 'admin@centrumchabowka.pl'
-const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD ?? 'Chabowka2026!'
+function requiredEnv(name: string): string {
+  const value = process.env[name]
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}. Add it to your local .env file.`)
+  }
+  return value
+}
 
 async function main() {
   loadEnvFile()
+  const adminEmail = requiredEnv('SEED_ADMIN_EMAIL')
+  const adminPassword = requiredEnv('SEED_ADMIN_PASSWORD')
 
   const { createUserWithEmailAndPassword, signInWithEmailAndPassword } = await import('firebase/auth')
   const { auth, db } = await import('../src/lib/firebase')
   const { seedPostsData } = await import('../src/lib/seedPosts')
 
   try {
-    await signInWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_PASSWORD)
+    await signInWithEmailAndPassword(auth, adminEmail, adminPassword)
   } catch {
-    await createUserWithEmailAndPassword(auth, ADMIN_EMAIL, ADMIN_PASSWORD)
+    await createUserWithEmailAndPassword(auth, adminEmail, adminPassword)
   }
 
   const count = await seedPostsData(db)
